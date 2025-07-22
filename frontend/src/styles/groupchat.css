@@ -1,0 +1,75 @@
+
+:root {
+    --color1: rgb(147, 125, 12);
+    --color2: white;
+}
+
+button {
+    background-color: var(--color2);
+    color: var(--color1);
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: var(--color1);
+    color: var(--color2);
+    font-weight: 600;
+}
+
+.navop {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.navop:hover{
+    background-color: #cfaf12;
+}
+
+#chathead {
+    background-image: url('../images/shop_image3.jpg');
+    background-size: contain;
+}
+
+.bgsolid {
+    background-color: var(--color1);
+    padding: .2rem;
+    border-radius: .2rem;
+}
+
+.on {
+    border-radius: 50%;
+    border:3px solid rgb(255, 247, 0);
+    background-color: var(--color1);
+    padding: 1px;
+}
+
+.off {
+    border-radius: 50%;
+    border: 3px solid var(--color1);
+}
+
+.sent .on {
+    border: 3px solid var(--color1);
+}
+
+.sent {
+    margin-left: auto;
+    padding: .5rem;
+    margin-top: .5rem;
+    border-radius: .5rem;
+    color: white;
+    display: flex;
+    flex-direction: row-reverse;
+    max-width: 50%;
+}
+
+.received {
+    display: flex;
+    max-width: 50%;
+    margin-right: auto;
+    padding: .5rem;
+    margin-top: .5rem;
+    border-radius: .5rem;
+    color: white;
+}
+
