@@ -247,7 +247,7 @@ export const Group = ( props ) => {
 
     return (
         <>
-            <nav style={{display: "flex", justifyContent: "center", height: "5rem", backgroundColor: "rgb(147, 125, 13)" }} >
+            <nav style={{ alignItems: "center", display: "flex", height: "3rem", justifyContent: "center", backgroundColor: "rgb(147, 125, 13)" }} >
                 <h1 style={{ flexGrow: 1, textAlign: "center", color: "white" }} > { props.group.group_name } </h1>
                 <button style={{ width: "4rem", height: "2rem" }}
                 onClick={()=> { if(!settings)setSettings(true); else setSettings(false)}} 
@@ -256,9 +256,9 @@ export const Group = ( props ) => {
             </nav>
 
 
-            { !settings && <div style={{ flexGrow: "1", display: "flex", flexDirection: "column" }} >
+            { !settings && <div style={{ overflow: "auto", display: "flex", flexDirection: "column", flexGrow: "1" }} >
 
-                <div style={{ flexGrow: "1", display: "flex", flexDirection: "column", maxHeight: "calc(100% - 6rem)",  overflow: "auto" }} >
+                <div style={{  display: "flex", flexDirection: "column", flexGrow: "1",  overflow: "auto" }} >
                     { messages && messages.map( x => <SingleMessage data={x} /> ) } 
                 </div>
 
@@ -346,7 +346,7 @@ export const Groups = () => {
                 </div>
             </div>
 
-            <div id="rightbar1" style={{border: ".2rem solid white", display: "flex", flexDirection: "column", backgroundColor: "rgb(147, 125, 13, 0.9)", borderRadius: ".5rem" }}>
+            <div  style={{ display: "flex", flexDirection: "column", overflow: "auto",  backgroundColor: "rgb(147, 125, 13, 0.9)", borderRadius: ".5rem" }}>
                 {selectedGroup && <Group group={selectedGroup} />}
             </div>
         </div>
