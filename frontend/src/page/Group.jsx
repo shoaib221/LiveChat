@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 import { Chat } from "./chat";
-import '../styles/groupchat.css';
+import '../styles/group.css';
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { SingleMessage } from "./chat";
@@ -111,12 +111,12 @@ export const GroupSettings = (props) => {
     },[props.group.group_id] )
 
     return (
-        <div style={{ overflowY: "auto", flexGrow: "1" }} >
+        <div style={{ overflowY: "auto", flexGrow: "1", backgroundColor: 'var(--color4)' }} >
             { props.group.admin === user.email && <button onClick={()=>DeleteGroup()} >Delete This Group</button> }
-            <h1 style={{ textAlign: "center", backgroundColor: 'var(--color1', fontWeight: '500' }} > Members </h1>
+            <h1 style={{ textAlign: "center", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Members </h1>
 
             { friends && friends.map( x=> {
-                if( memberMap[ x.username ] ) return (<div style={{ textAlign: "center" , backgroundColor: 'var(--color1)', margin: '.5rem', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem' }} > 
+                if( memberMap[ x.username ] ) return (<div style={{ textAlign: "center" , backgroundColor: 'var(--color3)', margin: '.5rem', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem', color: 'var(--color2)' }} > 
                     {x.username} 
                     { props.group.admin === user.email && <button onClick={ () => DeleteFromGroup( x.username ) } > Remove </button> }
                     </div>)
@@ -124,9 +124,9 @@ export const GroupSettings = (props) => {
 
             { props.group.admin === user.email && <>
             
-                <h1 style={{ textAlign: "center", marginTop: "2rem", backgroundColor: 'var(--color1', fontWeight: '500' }} > Friends </h1>
+                <h1 style={{ textAlign: "center", marginTop: "2rem", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Friends </h1>
                 { friends && friends.map( x=> {
-                    if( !memberMap[ x.username ] ) return (<div style={{ textAlign: "center", backgroundColor: 'var(--color1)', margin: '.5rem', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem' }} > 
+                    if( !memberMap[ x.username ] ) return (<div style={{ textAlign: "center", backgroundColor: 'var(--color3)', margin: '.5rem', color: 'var(--color2)', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem' }} > 
                         {x.username} 
                         <button onClick={ () => AddToGroup(x.username)  } > Add As Member </button>
                     </div>)
@@ -237,8 +237,8 @@ export const Group = ( props ) => {
 
         return (
             <div id={props.data._id} className={ props.data.sender === user.email? 'sent': 'received' }    >
-                <img src={ photo[props.data.sender] } style={{height: "2rem", width: "2rem" }} className={ onlineUsers[props.data.sender]? "on": "off" }  />
-                <div className="bgsolid" onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } > { props.data.text }  <br/>
+                <div style={{ backgroundImage: `url(${photo[props.data.sender]})` }}  className={ onlineUsers[props.data.sender]? "on photo-1": "off photo-1" }  > </div>
+                <div className="message-slot" onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } > { props.data.text }  <br/>
                 { detail && <> From { props.data.sender } <br/> At { fixTime(props.data.createdAt) } </> }
                 </div>
             </div>
@@ -247,24 +247,24 @@ export const Group = ( props ) => {
 
     return (
         <>
-            <nav style={{ alignItems: "center", display: "flex", height: "3rem", justifyContent: "center", backgroundColor: "rgb(147, 125, 13)" }} >
-                <h1 style={{ flexGrow: 1, textAlign: "center", color: "white" }} > { props.group.group_name } </h1>
-                <button style={{ width: "4rem", height: "2rem" }}
+            <div id='rightbar-nav'   >
+                <div style={{ flexGrow: 1, textAlign: "center", color: "white" }} > { props.group.group_name } </div>
+                <div style={{ width: "4rem", height: "100%", color: 'var(--color2)', cursor: 'pointer' }}
                 onClick={()=> { if(!settings)setSettings(true); else setSettings(false)}} 
                 > { settings? 'Back': 'Settings' } 
-                </button>
-            </nav>
+                </div>
+            </div>
 
 
             { !settings && <div style={{ overflow: "auto", display: "flex", flexDirection: "column", flexGrow: "1" }} >
 
-                <div style={{  display: "flex", flexDirection: "column", flexGrow: "1",  overflow: "auto" }} >
+                <div style={{  display: "flex", flexDirection: "column", flexGrow: "1",  padding: '.5rem', overflow: "auto", backgroundColor: 'var(--color4)' }} >
                     { messages && messages.map( x => <SingleMessage data={x} /> ) } 
                 </div>
 
-                <div style={{ backgroundColor: "rgb(147, 125, 13)", height: "5rem", borderRadius: "10px" }} > 
-                    <input type="text" style={{padding: ".5rem"}} value={newMessage} onChange={(e)=> setNewMessage(e.target.value)} />
-                    <button onClick={SendGroupMessage} > Send </button>
+                <div id='bottom-bar' >
+                    <input type="text" placeholder="Write Message" style={{padding: ".5rem", height: '100%', flexGrow: '1', backgroundColor: 'var(--color3)', color: 'var(--color2)' }} value={newMessage} onChange={(e)=> setNewMessage(e.target.value)} />
+                    <button onClick={SendGroupMessage}  > Send </button>
                 </div> 
                     
             </div>}
@@ -325,28 +325,28 @@ export const Groups = () => {
     }, [] )
 
     return (
-        <div id="groups" style={{  display: "grid", gridTemplateColumns: "1fr 4fr",  height: "100%" }} >
-            <div id="leftbar1"  style={{ border: ".2rem solid white", borderRadius: ".5rem", backgroundColor: "rgb(147, 125, 13, 0.8)", padding: "10px", overflow: "auto", alignItems: "center" }} >
-                <div style={{ textAlign: "center", fontWeight: "900" }}> Create New Group </div>
+        <div id="groups"  >
+            <div id="leftbar"   >
+                <div style={{ textAlign: 'center' }} > Create New Group </div>
                  
-                <div style={{display: "flex", flexDirection: "column",  alignItems: "center"}} > 
-                    <input placeholder="group name" value={newGroup} onChange={ (e)=> setNewGroup(e.target.value) }  />
+                <div style={{ display: 'flex', justifyContent: 'space-evenly', gap: '.5rem', padding: '.5rem' }} > 
+                    <input placeholder="group name" style={{ flexGrow: '1' }} value={newGroup} onChange={ (e)=> setNewGroup(e.target.value) }  />
                     <button onClick={()=> createGroup()}  > Submit </button>
                     <span> { error } </span>
                 </div> 
 
-
-                <div style={{ display: "flex", flexDirection: "column",  alignItems: "center", marginTop: "1rem" }} >
-                    <h4> Your Groups  </h4>
+                <div style={{ textAlign: 'center' }} >Your Groups</div>
+                <div  >
+                    
                     { groups && groups.map( x => (
                         
-                        <button id={x.group_id} style={{  margin: "2px", width: "80%"  }} onClick={() => setGroup(x)} > { x.group_name } </button> 
+                        <div id={x.group_id} style={{ cursor: 'pointer' }} className="hover1" onClick={() => setGroup(x)} > { x.group_name } </div> 
                         
                     ) ) }
                 </div>
             </div>
 
-            <div  style={{ display: "flex", flexDirection: "column", overflow: "auto",  backgroundColor: "rgb(147, 125, 13, 0.9)", borderRadius: ".5rem" }}>
+            <div id='rightbar' >
                 {selectedGroup && <Group group={selectedGroup} />}
             </div>
         </div>

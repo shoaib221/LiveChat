@@ -29,13 +29,14 @@ const Home = () => {
 	const { logout } = useLogout()
 	
 	return (
-		<div id="home" style={{ backgroundColor: "#3c03a7ff", height: "100%", alignItems: "center" }}>
-			<Link to='/chat' style={{ color: "white" }} >Chat</Link>
-            <Link to="/media" style={{ color: "white" }} > Media </Link>
-			<Link to="/profile" style={{ color: "white" }} > Profile </Link>
-			<Link to="/html" style={{ color: "white" }} > Html </Link>
-			<Link to="/formdata" style={{ color: "white" }} > Form Data </Link>
-			<Link to="/contact" style={{ color: "white" }} > Contact </Link>
+		<div id="home">
+			
+			<Link to='/chat'  >Chat</Link>
+            <Link to="/media"  > Media </Link>
+			<Link to="/profile"  > Profile </Link>
+			<Link to="/html"  > Html </Link>
+			<Link to="/formdata"  > Form Data </Link>
+			<Link to="/contact"  > Contact </Link>
 			<button onClick={logout} > Log Out </button>
 		</div>
 	)

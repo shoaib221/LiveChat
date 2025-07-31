@@ -42,18 +42,18 @@ export const ChatHead = () => {
     const [ option, setOption ] = useState(null)
 
     return (
-        <div id="chathead" style={{ width: "100%", height: "100%",  backgroundColor: "#5d5f01ff"  }} >
-            <nav style={{display: "flex", backgroundColor: "#937d0d", width: "100%", height: "10%", justifyContent: "space-evenly", alignItems: "center"}} >
+        <div id="chathead"  >
+            <nav  >
                 <div className="navop" onClick={()=> setOption("chat")} > Chat </div>
                 <div className="navop" onClick={()=> setOption("groups")} > Groups   </div>
             </nav>
 
 
-            <main style={{  height: "90%"  }} >
+            
                 { option ==="chat" && <Chat />  }
                 { option ==="contacts" && <Contacts /> }
                 { option ==="groups" && <Groups /> }
-            </main>
+            
         </div>
     )
 }
