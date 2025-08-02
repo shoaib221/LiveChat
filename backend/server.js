@@ -58,7 +58,8 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
 				const new_message = new Message ({
 					sender: data.sender,
 					receiver: data.receiver,
-					text: data.text
+					text: data.text,
+					createdAt: new Date().toLocaleString()
 				})
 
 				const saved_message = await new_message.save();
@@ -84,7 +85,8 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
 				const new_message = new GroupMessage({
 					group_id: data.receiver,
 					sender: data.sender,
-					text: data.text
+					text: data.text,
+					createdAt: new Date().toLocaleString()
 				})
 
 				const saved_message = await new_message.save();

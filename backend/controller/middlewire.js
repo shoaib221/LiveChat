@@ -20,7 +20,7 @@ const requireAuth = async (req, res, next) => {
 		next(); 
 	} catch (err) {
 		console.log(err.message, "backend");
-		res.status(401).json({error: err.message});
+		res.status(401).json({error: ' no file'});
 	}
 }
 

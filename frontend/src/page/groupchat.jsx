@@ -5,11 +5,10 @@ import { io } from "socket.io-client";
 
 import { Chat } from "./chat";
 import '../styles/groupchat.css';
-import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { SingleMessage } from "./chat";
-import logo1 from '../images/shop_image3.jpg';
 import { Groups } from "./Group";
+import { Profile } from "./profile";
 
 const api = axios.create( { baseURL: "http://localhost:4000" } )
 
@@ -46,14 +45,18 @@ export const ChatHead = () => {
             <nav  >
                 <div className="navop" onClick={()=> setOption("chat")} > Chat </div>
                 <div className="navop" onClick={()=> setOption("groups")} > Groups   </div>
+                <div className="navop" onClick={() => setOption('contacts') } > Contacts </div>
+                <div className="navop" onClick={() => setOption('profile') } > Profile </div>
+                <div className="navop" onClick={() => setOption('settings') } > Settings </div>
+                
             </nav>
 
 
-            
-                { option ==="chat" && <Chat />  }
-                { option ==="contacts" && <Contacts /> }
-                { option ==="groups" && <Groups /> }
-            
+            { option ==="chat" && <Chat />  }
+            { option ==="contacts" && <Contacts /> }
+            { option ==="groups" && <Groups /> }
+            { option === 'profile' && <Profile /> }
+        
         </div>
     )
 }

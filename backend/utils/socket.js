@@ -18,14 +18,24 @@ const io = new Server( server, {
 
 
 const onlineUserMap = {  };
+const my_username="" ;
 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, 'uploads/'); },
 	filename: function (req, file, cb) {
-		cb(null, Date.now() + '-' + file.originalname); }
+		cb(null, 'profile-photo' + '-' + req.username+'.jpg'); }
 });
 
 const multer_upload = multer({ storage: storage });
 
-module.exports = { app, io, onlineUserMap, server, multer_upload }
+const message_photo_upload = multer({ storage: multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, 'uploads/messages/'); },
+	filename: function (req, file, cb) {
+		cb(null, new Date().toLocaleString()+'-'+req.username+'.jpg' ); }
+
+
+})  })
+
+module.exports = { app, io, onlineUserMap, server, multer_upload, my_username, message_photo_upload }

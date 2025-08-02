@@ -11,6 +11,7 @@
     width: 30%;
     min-width: 30%;
     color: var(--color2);
+    overflow-y: scroll;
 }
 
 #rightbar {
@@ -73,7 +74,11 @@
     background-size: cover;
     background-position: center;
     border-radius: 50%;
-    border: .2rem solid var(--color3);
+    border: .1rem solid var(--color3);
+}
+
+.received .on {
+    border: .1rem solid greenyellow;
 }
 
 .hover1 {
@@ -86,3 +91,19 @@
     background-color: var(--color4);
 }
 
+.file-input-container {
+    position: relative;
+    color: white; 
+    cursor: pointer; 
+    height: '100%'; 
+    min-width:  2rem;
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--color3);
+}
+
+.file-input-container:hover {
+    border: 1px solid var(--color2);
+}

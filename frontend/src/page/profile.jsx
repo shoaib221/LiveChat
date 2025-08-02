@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/authContext";
+
 import axios from "axios";
 import '../styles/profile.css';
 
@@ -54,13 +55,12 @@ export const Profile = () => {
                 }
                 
             )
-            setName(response.data.name)
-            setDescription( response.data.description )
-            setImageurl( response.data.photo )
-            setError( "Succesfully uploaded" )
+            
+            alert("Successfully Updated");
+            
         
         } catch (err) {
-            setError( err.response.data.error )
+            alert( err.response.data.error )
         }
 
 
@@ -71,38 +71,40 @@ export const Profile = () => {
     }, [] )
 
     return (
-        <div className="profile">
-            <div id="top" className="flex-rowww">
-                <div className="profile-photo"
-                    style={{ backgroundImage: `url(${imageurl})`  }}
-                >
-                </div>
-
-                <div id="top-right">
-                    <h3> {name} </h3>
-                    <h5> {username} </h5>
-                </div>
-
-            </div>
+        <div className="profile" style={{ color: '#ffffffff', width: '50%', marginLeft: 'auto', marginRight: 'auto' }} >
             
-            
-            <div className="grid-container">
-            <div> Name </div>
-            <input value={name} onChange={ (e) => setName( e.target.value ) } />
-            
-
-            <div> Description </div>
-            <input value={description} onChange={ (e) => setDescription( e.target.value ) } />
-            
-
-            <div> Upload Image </div>
-            <input type="file" onChange={imageChange} />
-            
-
+            <div className="profile-photo"
+                style={{ border: '1px solid white', backgroundImage: `url(${imageurl})` , height: '10rem', width: '10rem', backgroundSize: 'cover', backgroundPosition: 'center',
+                        marginLeft: 'auto', marginRight: 'auto'  }}
+            >
             </div>
 
-            <button onClick={UpdateProfile} > Update </button>
-            { error }
+            
+
+            <div style={{ textAlign: "center" }} > {username}  </div>
+
+            
+            
+            
+            <div className="grid-container"
+                style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', textAlign: 'center', gap: '.5rem', marginTop: '3rem' }}
+            >
+                <div> Name </div>
+                <input value={name} onChange={ (e) => setName( e.target.value ) } />
+                
+
+                <div> Description </div>
+                <input value={description} onChange={ (e) => setDescription( e.target.value ) } />
+                
+
+                <div> Upload Image </div>
+                <input type="file" onChange={imageChange} style={{ cursor: 'pointer' }} />
+            
+            </div>
+
+            <div onClick={UpdateProfile} style={{ cursor: 'pointer', textAlign: 'center' }} > Update </div>
+
+            
         </div>
     )
 }

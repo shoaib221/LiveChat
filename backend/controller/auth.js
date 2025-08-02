@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken");
 const { requireAuth } = require("./middlewire.js");
 const { oauth2Client } = require("../utils/googleClient.js");
 const axios = require("axios");
-const { multer_upload } = require("../utils/socket.js")
+const { multer_upload  } = require("../utils/socket.js")
 
 
 authRouter.get("/test",  ( req, res, next ) => {
@@ -45,7 +45,7 @@ const Register = async ( req, response, nect ) => {
         const exist = await User.findOne({ username: email });
         if( exist ) throw Error("Email already exists");
         const hashedpassword = await hashy(password);
-        const user = await User.create({ username: email, password: hashedpassword });
+        const user = await User.create({ username: email, password: hashedpassword, photo: `http://localhost:4000/profile-photo-${email}.jpg` });
         const token = createToken(user._id);
         response.status(200).json({email, token});
     } catch (error) {
@@ -98,7 +98,7 @@ const GoogleLogin = async ( req, res, next ) => {
         
         let user = await User.findOne({ username: email });
         const dummy = await hashy(process.env.DUMMY_PASS);
-        if (!user) user = await User.create({ username: email, password: dummy });
+        if (!user) user = await User.create({ username: email, password: dummy, photo: `http://localhost:4000/profile-photo-${email}.jpg` });
         
         
         const token = createToken(user._id, user.username);
@@ -125,17 +125,16 @@ const Profile = async ( req, res, next  ) => {
 }
 
 const UpdateProfile = async ( req, res, next ) => {
-
+    console.log('update profile');
     try {   
         console.log( req.body );
 		console.log( req.file );
 		
-		let url = "http://localhost:4000/"+req.file.filename;
+		
 
         await User.updateOne( { username: req.username }, { $set: { 
             name: req.body.name,
-            description: req.body.description,
-            photo: url
+            description: req.body.description
          } } )
 
         const saved_user = await User.findOne( { username: req.username } )
@@ -143,7 +142,7 @@ const UpdateProfile = async ( req, res, next ) => {
         res.status(200).json( saved_user )
 
     } catch(err) {
-        res.status(400).json({ error: err.message })
+        res.status(400).json({ error: 'aha' })
     }
 }
 

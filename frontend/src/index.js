@@ -31,12 +31,7 @@ const Home = () => {
 	return (
 		<div id="home">
 			
-			<Link to='/chat'  >Chat</Link>
-            <Link to="/media"  > Media </Link>
-			<Link to="/profile"  > Profile </Link>
-			<Link to="/html"  > Html </Link>
-			<Link to="/formdata"  > Form Data </Link>
-			<Link to="/contact"  > Contact </Link>
+			<Link to='/livechat'  >Chat</Link>
 			<button onClick={logout} > Log Out </button>
 		</div>
 	)
@@ -53,13 +48,8 @@ function App() {
 				<Route exact path="/" element={ user? <Home/> :  <Navigate to='/auth' /> } ></Route>
 				<Route exact path='/auth' element={ user ? <Navigate to="/" /> : <Auth /> } >  </Route>
 				<Route exact path='/google-auth' element={ user ? <Navigate to="/" /> : <GoogleAuth /> } >  </Route>
-				<Route exact path='/profile' element={ user? <Profile /> : <Navigate to="/auth" /> } >  </Route>
 				<Route exact path='/test' element={<Test />} >  </Route>
-				<Route exact path='/chat' element={ user ? <ChatHead /> : <Navigate to="/auth" /> } ></Route>
-				<Route exact path='/media' element={ user ? <Media /> : <Navigate to="/auth" /> } ></Route>
-				<Route exact path='/profile' element={ user ? <Profile /> : <Navigate to="/auth" /> } ></Route>
-				<Route exact path='/html' element={ user ? <Html /> : <Navigate to="/auth" /> } ></Route>
-				<Route exact path='/formdata' element={ user ? <FormDataDemo /> : <Navigate to="/auth" /> } ></Route>
+				<Route exact path='/livechat' element={ user ? <ChatHead /> : <Navigate to="/auth" /> } ></Route>
 				<Route path='*' element={ <PageNotFound/> } ></Route>
 			</Routes>
 

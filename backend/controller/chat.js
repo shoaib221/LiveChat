@@ -15,6 +15,7 @@ const { Message, Group, GroupMessage, GroupMembers } = require("../models/chat.j
 const { cloudinary } = require("../utils/cloudinary.js");
 const { use } = require("react");
 const fetch = require("node-fetch");
+const { message_photo_upload } = require('../utils/socket.js')
 
 
 
@@ -54,6 +55,10 @@ const sendMessage = async ( req, res, next ) => {
 	try {
 		const { receiver, text } = req.body;
 
+		
+		let url = "";
+		if(req.file) url = 'http://localhost:4000/messages/'+req.file.filename;
+
 		const new_message = new Message({
 			sender: req.username,
 			receiver : receiver,
@@ -90,52 +95,6 @@ const FetchUsers = async ( req, res, next ) => {
 	}
 }
 
-
-const UploadImageClodianry = async ( req, res, next ) => {
-	console.log( "upload image" )
-	try {
-		const { image } = req.body;
-		if(!image) throw Error( "image not found" )
-		const response = await cloudinary.uploader.upload(image)
-		console.log( response.secure_url )
-		await User.updateOne( { username: req.username }, { image: response.secure_url }  )
-		const user =await User.findOne( { username: req.username } )
-		console.log(user)
-		res.status(200).json({ user })
-	} catch (err) {
-		console.log("error", err.error)
-		res.status(400).json( { error: err.error } )
-		
-	} finally {
-		next();
-	}
-}
-
-
-const ReceiveFormData = async ( req, res, next ) => {
-	try {
-	console.log( req.body );
-	console.log( req.file );
-	res.status(200).json( { "msg": "ok" } );
-	} catch (err) {
-		res.status(400).json( { error: err.message } )
-	}
-}
-
-const FormToCloud = async ( req, res, next ) => {
-	try {
-		console.log( req.body );
-		console.log( req.file );
-		
-		let url = "http://localhost:4000/"+req.file.filename;
-		
-		
-		res.status(200).json( { "url": url } );
-	} catch (err) {
-		console.log("error", err)
-		res.status(400).json( { error: err.message } )
-	}
-}
 
 const createGroup = async (req, res, next) => {
 	console.log("create group")
@@ -259,20 +218,30 @@ const FetchGroupMessage =  async ( req, res, next ) => {
 	}
 }
 
+const LeaveGroup = async (req, res, next) => {
+	try {
+		const { group_id } =req.body
+		await GroupMembers.deleteOne( { member : req.username } );
+		res.status(200).json("Left From The Group")
+	} catch (err) {
+		res.status(400).json({ error: err.message })
+	}
+}
+
 
 chatRouter.use( requireAuth );
 chatRouter.post( "/fetchmessage", fetchMessage);
-chatRouter.post( "/sendmessage", sendMessage );
+chatRouter.post( "/sendmessage", message_photo_upload.single('media'), sendMessage );
 chatRouter.get( "/users", FetchUsers );
-chatRouter.post( "/image", UploadImageClodianry );
-chatRouter.post( "/formdata", multer_upload.single('photo'), ReceiveFormData );
-chatRouter.post( '/formtocloud', multer_upload.single('photo'), FormToCloud );
+
+
 chatRouter.post( "/creategroup", createGroup  );
 chatRouter.get( "/fetchgroups", FetchGroups );
 chatRouter.post( "/addtogroup", AddToGroup );
 chatRouter.post( "/fetchgroupmembers", FetchGroupMembers );
 chatRouter.post( "/deletemember", DeleteFromGroup );
 chatRouter.post( "/deletegroup", DeleteGroup)
+chatRouter.post( "/leavegroup", LeaveGroup)
 chatRouter.post( "/fetchgroupmessage", FetchGroupMessage )
 
 

@@ -1,4 +1,5 @@
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 import { use, useEffect, useState } from "react";
 import axios from "axios";
@@ -8,7 +9,7 @@ import '../styles/group.css';
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { SingleMessage } from "./chat";
-import logo1 from '../images/shop_image3.jpg';
+
 
 const api = axios.create( { baseURL: "http://localhost:4000" } );
 
@@ -84,6 +85,22 @@ export const GroupSettings = (props) => {
         }
     }
 
+    const LeaveGroup = async (  ) => {
+        
+        try {
+            const response = await api.post( "/chat/leavegroup", 
+                { group_id: props.group.group_id },
+                { headers: { 'Authorization': `Bearer ${user.token}` } }
+            )
+
+            alert( response.data );
+        } catch(err) {
+            alert( err.response.data.error )
+        }
+    }
+
+    
+
     const fetchMembers = async () => {
         console.log("aha", props)
         try {
@@ -110,12 +127,23 @@ export const GroupSettings = (props) => {
         }
     },[props.group.group_id] )
 
+    const [ memberOpener, setMemberOpener ] = useState(false)
+    const [ friendOpener, setFriendOpener ] = useState(false)
+
     return (
         <div style={{ overflowY: "auto", flexGrow: "1", backgroundColor: 'var(--color4)' }} >
             { props.group.admin === user.email && <button onClick={()=>DeleteGroup()} >Delete This Group</button> }
-            <h1 style={{ textAlign: "center", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Members </h1>
+            { props.group.admin !== user.email && <button onClick={()=>LeaveGroup()} >Leave From This Group</button> }
+            
+            
+            
+            <h1 style={{ textAlign: "center", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Members 
+                <FontAwesomeIcon icon={faArrowDown} className='icon' style={{ marginLeft: '1rem', cursor: 'pointer' }} 
+                    onClick={() => { if ( memberOpener ) setMemberOpener(false); else setMemberOpener(true) }}
+                />
+            </h1>
 
-            { friends && friends.map( x=> {
+            { memberOpener && friends && friends.map( x=> {
                 if( memberMap[ x.username ] ) return (<div style={{ textAlign: "center" , backgroundColor: 'var(--color3)', margin: '.5rem', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem', color: 'var(--color2)' }} > 
                     {x.username} 
                     { props.group.admin === user.email && <button onClick={ () => DeleteFromGroup( x.username ) } > Remove </button> }
@@ -124,8 +152,14 @@ export const GroupSettings = (props) => {
 
             { props.group.admin === user.email && <>
             
-                <h1 style={{ textAlign: "center", marginTop: "2rem", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Friends </h1>
-                { friends && friends.map( x=> {
+                <h1 style={{ textAlign: "center", marginTop: "2rem", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Friends
+
+                    <FontAwesomeIcon icon={faArrowDown} className='icon' style={{ marginLeft: '1rem', cursor: 'pointer' }} 
+                        onClick={() => { if ( friendOpener ) setFriendOpener(false); else setFriendOpener(true) }}
+                    />
+
+                </h1>
+                { friendOpener && friends && friends.map( x=> {
                     if( !memberMap[ x.username ] ) return (<div style={{ textAlign: "center", backgroundColor: 'var(--color3)', margin: '.5rem', color: 'var(--color2)', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem' }} > 
                         {x.username} 
                         <button onClick={ () => AddToGroup(x.username)  } > Add As Member </button>
@@ -245,6 +279,22 @@ export const Group = ( props ) => {
         )
     }
 
+    const [ mediaFiles, setMediaFiles ] = useState(null)
+    const [ mediaURLs, setMediaURLs ] = useState(null)
+
+    const mediaChange = (event) => {
+        
+        let files=[], urls=[]
+        for( let x=0; x<event.target.files.length; x++ )
+        {
+            files.push( event.target.files[x] );
+            urls.push( URL.createObjectURL( event.target.files[x] ) );
+        }
+        setMediaFiles( files )
+        setMediaURLs( urls )
+        if( event.target.files.length === 0 ) setMediaURLs(null)
+    }
+
     return (
         <>
             <div id='rightbar-nav'   >
@@ -262,9 +312,23 @@ export const Group = ( props ) => {
                     { messages && messages.map( x => <SingleMessage data={x} /> ) } 
                 </div>
 
-                <div id='bottom-bar' >
+                <div id='bottom-bar' style={{ position: 'relative' }} >
+
+                    { mediaURLs && <div id='media' style={{ position: 'absolute', height: '3rem', width: '100%', bottom: '100%', display: 'flex' }} >
+                        { mediaURLs && mediaURLs.map( x => (
+                            <div style={{ width: '3rem', backgroundImage: `url(${x})`, backgroundSize: 'cover' }} >
+
+                            </div>
+                        ) ) }
+                    </div> }                  
+                    
+                    <div className='file-input-container'  >
+                        +
+                        <input onChange={mediaChange} type='file' multiple style={{ cursor: 'pointer', position: 'absolute', left: '0', right: '0', width: '100%', height: '100%', opacity: '0'}} />
+                    </div>
+                    
                     <input type="text" placeholder="Write Message" style={{padding: ".5rem", height: '100%', flexGrow: '1', backgroundColor: 'var(--color3)', color: 'var(--color2)' }} value={newMessage} onChange={(e)=> setNewMessage(e.target.value)} />
-                    <button onClick={SendGroupMessage}  > Send </button>
+                    <button onClick={SendGroupMessage} style={{ cursor: 'pointer' }}  > Send </button>
                 </div> 
                     
             </div>}
@@ -302,7 +366,7 @@ export const Groups = () => {
             setGroups( [ ...groups, response.data ] )
             console.log( response.data )
         } catch (err) {
-            setError( err.response.data.error )
+            alert( err.response.data.error )
         }
     }
 
@@ -324,10 +388,15 @@ export const Groups = () => {
         
     }, [] )
 
+    const [ groupsOpener, setGroupsOpener  ] = useState(false)
+
     return (
         <div id="groups"  >
             <div id="leftbar"   >
-                <div style={{ textAlign: 'center' }} > Create New Group </div>
+                <div style={{ textAlign: 'center' }} > 
+                    Create New Group
+
+                </div>
                  
                 <div style={{ display: 'flex', justifyContent: 'space-evenly', gap: '.5rem', padding: '.5rem' }} > 
                     <input placeholder="group name" style={{ flexGrow: '1' }} value={newGroup} onChange={ (e)=> setNewGroup(e.target.value) }  />
@@ -335,15 +404,19 @@ export const Groups = () => {
                     <span> { error } </span>
                 </div> 
 
-                <div style={{ textAlign: 'center' }} >Your Groups</div>
-                <div  >
+                <div style={{ textAlign: 'center', fontWeight: '600', fontSize: '1.3rem', borderTop: '3px solid var(--color4)' }} >Your Groups
+                    <FontAwesomeIcon icon={faArrowDown} className='icon' style={{ marginLeft: '1rem', cursor: 'pointer' }} 
+                        onClick={() => { if ( groupsOpener ) setGroupsOpener(false); else setGroupsOpener(true) }}
+                    />
+                </div>
+                { groupsOpener && <div  >
                     
                     { groups && groups.map( x => (
                         
                         <div id={x.group_id} style={{ cursor: 'pointer' }} className="hover1" onClick={() => setGroup(x)} > { x.group_name } </div> 
                         
                     ) ) }
-                </div>
+                </div>}
             </div>
 
             <div id='rightbar' >

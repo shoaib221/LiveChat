@@ -80,12 +80,16 @@ const GroupMessageSchema = new mongoose.Schema({
     },
     text: {
         type: String,
+        required: true
     }, 
     media: {
         type: String
-    }},
-    { timestamps: true }
-)
+    },
+    createdAt: {
+        type: String,
+        required: true
+    }
+})
 
 const GroupMessage = mongoose.model("GroupMessage", GroupMessageSchema );
 
