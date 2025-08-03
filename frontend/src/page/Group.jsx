@@ -236,13 +236,11 @@ export const Group = ( props ) => {
     },[props.group.group_id] )
 
     if(socket) {
-        socket.on( "groupMessage", (data) => {
-            setMessages( [ ...messages, data ] );
-        } )
+        
 
         socket.on( "newGroupMessage", (data) => {
-            setMessages( [ ...messages, data ] )
-            console.log(data)
+            setMessages( [ ...messages, ...data ] )
+            //console.log(data)
         } )
 
         socket.on( "onlineUsers", (data) => {
@@ -264,7 +262,7 @@ export const Group = ( props ) => {
         
     }
 
-    const fixTime = ( x ) => x.toLocaleString()
+    const fixTime = ( x ) => x
 
     const SingleMessage = (props) => {
         const [ detail, setDetail ] = useState(false)
@@ -272,20 +270,31 @@ export const Group = ( props ) => {
         return (
             <div id={props.data._id} className={ props.data.sender === user.email? 'sent': 'received' }    >
                 <div style={{ backgroundImage: `url(${photo[props.data.sender]})` }}  className={ onlineUsers[props.data.sender]? "on photo-1": "off photo-1" }  > </div>
-                <div className="message-slot" onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } > { props.data.text }  <br/>
+                
+                
+                { props.data.text && <div className="message-slot" onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } > { props.data.text }  <br/>
                 { detail && <> From { props.data.sender } <br/> At { fixTime(props.data.createdAt) } </> }
-                </div>
+                </div> }
+
+
+                { props.data.media && <div className="message-slot" onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } > 
+
+                <img src={props.data.media} style={{ height: '3rem', width: '3rem' }} />
+                { detail && <div> From { props.data.sender } <br/> At { fixTime(props.data.createdAt) } </ div> }
+                </div> }
+
+
             </div>
         )
     }
 
-    const [ mediaFiles, setMediaFiles ] = useState(null)
+    const [ mediaFiles, setMediaFiles ] = useState([])
     const [ mediaURLs, setMediaURLs ] = useState(null)
 
     const mediaChange = (event) => {
         
         let files=[], urls=[]
-        for( let x=0; x<event.target.files.length; x++ )
+        for( let x=0; x < event.target.files.length; x++ )
         {
             files.push( event.target.files[x] );
             urls.push( URL.createObjectURL( event.target.files[x] ) );
@@ -293,6 +302,33 @@ export const Group = ( props ) => {
         setMediaFiles( files )
         setMediaURLs( urls )
         if( event.target.files.length === 0 ) setMediaURLs(null)
+    }
+
+    const sendMessage = async (  ) => {
+        try {
+            
+            const formData = new FormData()
+            formData.append( 'text', newMessage )
+            mediaFiles.forEach( (file) => formData.append( 'media', file ) )
+            formData.append( 'sender', user.email )
+            formData.append( 'group_id', props.group.group_id )
+
+            console.log(mediaFiles)
+            
+            const response  = await api.post( "/chat/group_message", formData, 
+                {
+                    headers: {'Authorization': `Bearer ${user.token}`}
+                }
+            )
+
+            setMessages( [ ...messages, ...response.data] )
+            setNewMessage("")
+            setMediaFiles([])
+            setMediaURLs(null)
+
+        } catch (err) {
+            alert( err.response.data.error )
+        }
     }
 
     return (
@@ -328,7 +364,7 @@ export const Group = ( props ) => {
                     </div>
                     
                     <input type="text" placeholder="Write Message" style={{padding: ".5rem", height: '100%', flexGrow: '1', backgroundColor: 'var(--color3)', color: 'var(--color2)' }} value={newMessage} onChange={(e)=> setNewMessage(e.target.value)} />
-                    <button onClick={SendGroupMessage} style={{ cursor: 'pointer' }}  > Send </button>
+                    <button onClick={sendMessage} style={{ cursor: 'pointer' }}  > Send </button>
                 </div> 
                     
             </div>}

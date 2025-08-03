@@ -10,12 +10,12 @@ const axios = require("axios");
 const { User } = require( "../models/auth.js" );
 const { requireAuth } = require("./middlewire.js");
 const { oauth2Client } = require("../utils/googleClient.js");
-const { onlineUserMap, io, multer_upload }  = require("../utils/socket.js");
+
 const { Message, Group, GroupMessage, GroupMembers } = require("../models/chat.js");
 const { cloudinary } = require("../utils/cloudinary.js");
 const { use } = require("react");
 const fetch = require("node-fetch");
-const { message_photo_upload } = require('../utils/socket.js')
+const { message_photo_upload, io, onlineUserMap } = require('../utils/socket.js')
 
 
 
@@ -228,13 +228,57 @@ const LeaveGroup = async (req, res, next) => {
 	}
 }
 
+const GroupMessageCont = async ( req, res, next ) => {
+	try {
+		const { text, sender, group_id } = req.body
+		let messages = []
+		if(text) messages.push( new GroupMessage({ text, sender, group_id, createdAt: new Date().toLocaleString(), media: null }) )
+		console.log( req.files, req.file )
+		for( let i=0; i<req.files.length ; i++ )
+		{
+			console.log( req.files[i].filename )
+			messages.push( new GroupMessage({
+				sender, group_id,
+				media: 'http://localhost:4000/messages/'+ req.files[i].filename,
+				createdAt: new Date().toLocaleString(),
+				text: null
+			}) )
+		}
+
+		let saved_messages = []
+		for( let i=0; i<messages.length; i++ )
+		{
+			let result = await messages[i].save()
+			saved_messages.push( result )
+		}
+
+
+		//const saved_message = await new_message.save();
+		
+		const group_members = await GroupMembers.find( { group_id } )
+		
+						
+		group_members.map(x => {
+			// console.log(x)
+			if( onlineUserMap[x.member] ) 
+				console.log("got it")
+				io.to( onlineUserMap[x.member] ).emit( "newGroupMessage", saved_messages )
+		})
+
+		res.status(200).json( saved_messages )
+
+		next()
+
+	} catch (err) {
+		res.status(400).json( {error: 'backend'+err.message} )
+	}
+}
+
 
 chatRouter.use( requireAuth );
 chatRouter.post( "/fetchmessage", fetchMessage);
 chatRouter.post( "/sendmessage", message_photo_upload.single('media'), sendMessage );
 chatRouter.get( "/users", FetchUsers );
-
-
 chatRouter.post( "/creategroup", createGroup  );
 chatRouter.get( "/fetchgroups", FetchGroups );
 chatRouter.post( "/addtogroup", AddToGroup );
@@ -243,7 +287,7 @@ chatRouter.post( "/deletemember", DeleteFromGroup );
 chatRouter.post( "/deletegroup", DeleteGroup)
 chatRouter.post( "/leavegroup", LeaveGroup)
 chatRouter.post( "/fetchgroupmessage", FetchGroupMessage )
-
+chatRouter.post("/group_message", message_photo_upload.array('media'), GroupMessageCont )
 
 
 module.exports = { chatRouter };

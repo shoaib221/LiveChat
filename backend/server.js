@@ -15,7 +15,6 @@ app.use(mainRouter);
 
 app.use( ( req, res, next ) => {
 	console.log("backend", new Date().toLocaleString() );
-	
 } );
 
 
@@ -35,7 +34,7 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
   		const token = auth.split(' ')[1]
 
 		
-
+		
   		try {
     		const { _id } = jwt.verify(token, process.env.JWT_SECRET); 
 			//console.log( "token", token );

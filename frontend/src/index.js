@@ -16,7 +16,7 @@ import { AuthContext } from './context/authContext';
 import { GoogleAuth } from './GoogleAuth.jsx';
 import { PageNotFound } from './page/PageNotFound';
 import { Socket } from "./page/socket";
-import { Test } from "./page/test";
+
 import { Chat } from "./page/chat";
 import { Media } from './page/media.jsx';
 import { Profile } from './page/profile.jsx';
@@ -24,6 +24,7 @@ import { Html } from './page/html.jsx';
 import { FormDataDemo } from './page/FormData.jsx';
 import { ChatHead } from './page/groupchat.jsx';
 import { useLogout } from './hooks/auth.js';
+import { Test } from './test.jsx';
 
 const Home = () => {
 	const { logout } = useLogout()
@@ -48,8 +49,9 @@ function App() {
 				<Route exact path="/" element={ user? <Home/> :  <Navigate to='/auth' /> } ></Route>
 				<Route exact path='/auth' element={ user ? <Navigate to="/" /> : <Auth /> } >  </Route>
 				<Route exact path='/google-auth' element={ user ? <Navigate to="/" /> : <GoogleAuth /> } >  </Route>
-				<Route exact path='/test' element={<Test />} >  </Route>
+				
 				<Route exact path='/livechat' element={ user ? <ChatHead /> : <Navigate to="/auth" /> } ></Route>
+				<Route exact path='/test' element={ <Test /> } ></Route>
 				<Route path='*' element={ <PageNotFound/> } ></Route>
 			</Routes>
 

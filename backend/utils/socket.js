@@ -33,7 +33,7 @@ const message_photo_upload = multer({ storage: multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, 'uploads/messages/'); },
 	filename: function (req, file, cb) {
-		cb(null, new Date().toLocaleString()+'-'+req.username+'.jpg' ); }
+		cb(null,  Date.now()+'-'+file.originalname ); }
 
 
 })  })
