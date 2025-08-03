@@ -95,15 +95,20 @@
     position: relative;
     color: white; 
     cursor: pointer; 
-    height: '100%'; 
-    min-width:  2rem;
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    
     border: 1px solid var(--color3);
 }
 
 .file-input-container:hover {
     border: 1px solid var(--color2);
+}
+
+.file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    cursor: pointer; 
+    opacity: 0;
 }

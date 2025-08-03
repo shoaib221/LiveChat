@@ -331,6 +331,8 @@ export const Group = ( props ) => {
         }
     }
 
+    const [ fileinputOpener, setFileinputOpener ] = useState(false)
+
     return (
         <>
             <div id='rightbar-nav'   >
@@ -358,10 +360,29 @@ export const Group = ( props ) => {
                         ) ) }
                     </div> }                  
                     
-                    <div className='file-input-container'  >
-                        +
-                        <input onChange={mediaChange} type='file' multiple style={{ cursor: 'pointer', position: 'absolute', left: '0', right: '0', width: '100%', height: '100%', opacity: '0'}} />
-                    </div>
+                    <div style={{ color: 'white', cursor: 'pointer' }} onClick={()=> { if(fileinputOpener) setFileinputOpener(false); else setFileinputOpener(true) }}  > + </div>
+
+                    { fileinputOpener && <div style={{ position: 'absolute', left: '0', bottom: '100%', width: '10rem', display: 'flex', flexDirection: 'column-reverse', backgroundColor: 'var(--color3)' }} >
+                        <div className='file-input-container' >
+                            Video
+                            <input className='file-input' accept="video/*" onChange={mediaChange} type='file' multiple  />
+                        </div>
+                        <div className='file-input-container' >
+                            Audio
+                            <input className='file-input' accept="audio/*" onChange={mediaChange} type='file' multiple  />
+                        </div>
+                        <div className='file-input-container' >
+                            Photo
+                            <input className='file-input' accept="image/*" onChange={mediaChange} type='file' multiple  />
+                        </div>
+                        
+                        <div className='file-input-container' >
+                            PDF
+                            <input className='file-input' accept=".pdf" onChange={mediaChange} type='file' multiple  />
+                        </div>
+                    </div> }
+                    
+                    
                     
                     <input type="text" placeholder="Write Message" style={{padding: ".5rem", height: '100%', flexGrow: '1', backgroundColor: 'var(--color3)', color: 'var(--color2)' }} value={newMessage} onChange={(e)=> setNewMessage(e.target.value)} />
                     <button onClick={sendMessage} style={{ cursor: 'pointer' }}  > Send </button>
