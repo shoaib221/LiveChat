@@ -1,184 +1,21 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import {  useEffect, useState, useContext } from "react";
 
-import { use, useEffect, useState } from "react";
-import axios from "axios";
-import { io } from "socket.io-client";
+
+import { FileInput } from './FileInput';
+import {api} from '../api'
 import { Chat } from "./chat";
 import '../styles/group.css';
-import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
-import { SingleMessage } from "./chat";
-
-
-const api = axios.create( { baseURL: "http://localhost:4000" } );
-
-
-
-export const GroupSettings = (props) => {
-    const [ friends, setFriends ] = useState(null)
-    const { user } = useContext(AuthContext)
-    const [ memberMap, setMemberMap ] = useState({})
-
-    const fetchFriends = async () => {
-        console.log("fetch friends")
-        try {
-            const response = await api.get( "/chat/users", 
-                { headers: { 'Authorization': `Bearer ${user.token}` } }
-            )
-            
-            setFriends( response.data.users )
-            console.log(response.data)
-        } catch (err) {
-            console.log( err.response.data.error )
-        }
-    }
-
-    const DeleteFromGroup = async ( who ) => {
-
-        try {
-            const response = await api.post( "/chat/deletemember", 
-                { group_id: props.group.group_id, member: who } ,
-                { headers: { 'Authorization': `Bearer ${user.token}` } }
-            )
-            console.log("successful", who)
-            let abc = {  }
-            abc[who]=false
-            console.log( { ...memberMap, ...abc } )
-            setMemberMap( { ...memberMap, ...abc } )
-        } catch(err) {
-            console.log( err.response.data.error )
-        }
-    }
-
-    const AddToGroup = async ( new_member ) => {
-        console.log("addtogroup" )
-        console.log( props.group )
-        console.log("addtogroup" )
-        try {
-            const response = await api.post( "/chat/addtogroup", 
-                { group_name: props.group.group_name, new_member },
-                { headers: { 'Authorization': `Bearer ${user.token}` } }
-            )
-
-            console.log(response.data)
-            //console.log(members)
-            let abc = {}
-            abc[ new_member ] = true
-            setMemberMap( { ...memberMap, ...abc } )
-        } catch (err) {
-            console.log( err.response.data.error )
-        }
-    }
-
-    const DeleteGroup = async (  ) => {
-        
-        try {
-            const response = await api.post( "/chat/deletegroup", 
-                { group_id: props.group.group_id },
-                { headers: { 'Authorization': `Bearer ${user.token}` } }
-            )
-
-            console.log( response.data );
-        } catch(err) {
-            console.log( err.response.data.error )
-        }
-    }
-
-    const LeaveGroup = async (  ) => {
-        
-        try {
-            const response = await api.post( "/chat/leavegroup", 
-                { group_id: props.group.group_id },
-                { headers: { 'Authorization': `Bearer ${user.token}` } }
-            )
-
-            alert( response.data );
-        } catch(err) {
-            alert( err.response.data.error )
-        }
-    }
-
-    
-
-    const fetchMembers = async () => {
-        console.log("aha", props)
-        try {
-            const response = await api.post("/chat/fetchgroupmembers",
-                { group_id: props.group.group_id },
-                { headers: { 'Authorization': `Bearer ${user.token}` } }
-            )
-            console.log("fetch members 2");
-            console.log( response.data );
-            let bcd = {}
-            response.data.map( x=> bcd[ x.member ] = true )
-            setMemberMap( bcd )
-            fetchFriends()
-        } catch(err) {
-            console.log( err )
-        }
-    }
-
-    useEffect( () => {
-        if(props) {
-            console.log("setting", props )
-            fetchMembers();
-            
-        }
-    },[props.group.group_id] )
-
-    const [ memberOpener, setMemberOpener ] = useState(false)
-    const [ friendOpener, setFriendOpener ] = useState(false)
-
-    return (
-        <div style={{ overflowY: "auto", flexGrow: "1", backgroundColor: 'var(--color4)' }} >
-            { props.group.admin === user.email && <button onClick={()=>DeleteGroup()} >Delete This Group</button> }
-            { props.group.admin !== user.email && <button onClick={()=>LeaveGroup()} >Leave From This Group</button> }
-            
-            
-            
-            <h1 style={{ textAlign: "center", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Members 
-                <FontAwesomeIcon icon={faArrowDown} className='icon' style={{ marginLeft: '1rem', cursor: 'pointer' }} 
-                    onClick={() => { if ( memberOpener ) setMemberOpener(false); else setMemberOpener(true) }}
-                />
-            </h1>
-
-            { memberOpener && friends && friends.map( x=> {
-                if( memberMap[ x.username ] ) return (<div style={{ textAlign: "center" , backgroundColor: 'var(--color3)', margin: '.5rem', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem', color: 'var(--color2)' }} > 
-                    {x.username} 
-                    { props.group.admin === user.email && <button onClick={ () => DeleteFromGroup( x.username ) } > Remove </button> }
-                    </div>)
-            } ) }
-
-            { props.group.admin === user.email && <>
-            
-                <h1 style={{ textAlign: "center", marginTop: "2rem", backgroundColor: 'var(--color3)', fontWeight: '500', color: 'var(--color2)' }} > Friends
-
-                    <FontAwesomeIcon icon={faArrowDown} className='icon' style={{ marginLeft: '1rem', cursor: 'pointer' }} 
-                        onClick={() => { if ( friendOpener ) setFriendOpener(false); else setFriendOpener(true) }}
-                    />
-
-                </h1>
-                { friendOpener && friends && friends.map( x=> {
-                    if( !memberMap[ x.username ] ) return (<div style={{ textAlign: "center", backgroundColor: 'var(--color3)', margin: '.5rem', color: 'var(--color2)', padding: '.5rem', fontWeight: '450', borderRadius: '.5rem' }} > 
-                        {x.username} 
-                        <button onClick={ () => AddToGroup(x.username)  } > Add As Member </button>
-                    </div>)
-                } ) }
-            
-            </>  }
-            
-        </div>
-    )
-}
+import { GroupSettings } from './GroupSettings';
 
 
 
 export const Group = ( props ) => {
     const [ settings, setSettings ] = useState(false);
-    const { user } = useContext(AuthContext);
+    const { user, socket } = useContext(AuthContext);
     const [ messages, setMessages ] = useState([]);
-    const [ socket, setSocket ] = useState(null);
     const [ newMessage, setNewMessage ] = useState(null);
     const [ onlineUsers, setOnlineUsers ] = useState({})
     const [ photo, setPhoto ] = useState({})
@@ -190,8 +27,7 @@ export const Group = ( props ) => {
                 { group_id: props.group.group_id },
                 { headers: { 'Authorization': `Bearer ${user.token}` } }
             )
-            console.log("fetch members 2");
-            console.log( response.data );
+            
             let bcd = {}
             response.data.map( x=> bcd[ x.member ] = x.photo )
             setPhoto(bcd)
@@ -208,27 +44,12 @@ export const Group = ( props ) => {
                     {'Authorization': `Bearer ${user.token}`}
                 }
             )
-            console.log( response.data )
+            //console.log( response.data )
             setMessages( response.data )
         } catch(err) {
             console.log( err.response.data.error )
         }
     }
-
-    function connectSocket () {
-        const client = io( 'http://localhost:4000', {
-            query: {
-                auth: `Bearer ${user.token}`
-            }
-        } )
-        setSocket( client );
-    }
-    
-    useEffect(() => {
-        connectSocket();
-        
-        console.log( props )
-    },[])
 
     useEffect( ()=> {
         fetchMessage();
@@ -239,6 +60,7 @@ export const Group = ( props ) => {
         
 
         socket.on( "newGroupMessage", (data) => {
+            console.log("newGroupMessage")
             setMessages( [ ...messages, ...data ] )
             //console.log(data)
         } )
@@ -272,62 +94,41 @@ export const Group = ( props ) => {
                 <div style={{ backgroundImage: `url(${photo[props.data.sender]})` }}  className={ onlineUsers[props.data.sender]? "on photo-1": "off photo-1" }  > </div>
                 
                 
-                { props.data.text && <div className="message-slot" onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } > { props.data.text }  <br/>
-                { detail && <> From { props.data.sender } <br/> At { fixTime(props.data.createdAt) } </> }
-                </div> }
-
-
-                { props.data.media && <div className="message-slot" onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } > 
-
-                <img src={props.data.media} style={{ height: '3rem', width: '3rem' }} />
-                { detail && <div> From { props.data.sender } <br/> At { fixTime(props.data.createdAt) } </ div> }
-                </div> }
-
+                
+                
+                <div style={{ overflow: 'initial' }}  onClick={()=> { if(detail) setDetail(false); else setDetail(true) } } >
+                        { props.data.text && <div className="message-slot"  > { props.data.text }  </div> }
+                        { props.data.mediaType === 'video' && <video  className="media" controls src={props.data.mediaURL} ></video> }
+                        { props.data.mediaType ==='audio' && <audio  className="media" src={props.data.mediaURL} controls ></audio> }
+                        { props.data.mediaType ==='photo' && <img   className="media" src={props.data.mediaURL}  /> }
+                        { props.data.mediaType ==='pdf' &&   <embed  className="media"  src={props.data.mediaURL} type="application/pdf"  /> }
+                        { detail && <div> From { props.data.sender } <br/> At { fixTime(props.data.createdAt) } </div> }    
+                </div>
 
             </div>
         )
     }
 
-    const [ mediaFiles, setMediaFiles ] = useState([])
-    const [ mediaURLs, setMediaURLs ] = useState(null)
-
-    const mediaChange = (event) => {
-        
-        let files=[], urls=[]
-        for( let x=0; x < event.target.files.length; x++ )
-        {
-            files.push( event.target.files[x] );
-            urls.push( URL.createObjectURL( event.target.files[x] ) );
-        }
-        setMediaFiles( files )
-        setMediaURLs( urls )
-        if( event.target.files.length === 0 ) setMediaURLs(null)
-    }
+    
 
     const sendMessage = async (  ) => {
         try {
             
             const formData = new FormData()
-            formData.append( 'text', newMessage )
-            mediaFiles.forEach( (file) => formData.append( 'media', file ) )
-            formData.append( 'sender', user.email )
-            formData.append( 'group_id', props.group.group_id )
+            formData.append('text', newMessage) 
+            formData.append( 'sender', user.email ) 
+            formData.append( 'group_id', props.group.group_id ) 
 
-            console.log(mediaFiles)
+            let response = null;
+
+            if( newMessage ) response = await api.post( "/chat/group_message", formData, {
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            } )
             
-            const response  = await api.post( "/chat/group_message", formData, 
-                {
-                    headers: {'Authorization': `Bearer ${user.token}`}
-                }
-            )
-
-            setMessages( [ ...messages, ...response.data] )
-            setNewMessage("")
-            setMediaFiles([])
-            setMediaURLs(null)
-
+            setNewMessage(null)
+            
         } catch (err) {
-            alert( err.response.data.error )
+            alert( "front " + err.message )
         }
     }
 
@@ -335,7 +136,7 @@ export const Group = ( props ) => {
 
     return (
         <>
-            <div id='rightbar-nav'   >
+            <div id='rightbar-nav'  style={{ borderBottom: '.1rem solid var(--color4)' }} >
                 <div style={{ flexGrow: 1, textAlign: "center", color: "white" }} > { props.group.group_name } </div>
                 <div style={{ width: "4rem", height: "100%", color: 'var(--color2)', cursor: 'pointer' }}
                 onClick={()=> { if(!settings)setSettings(true); else setSettings(false)}} 
@@ -344,146 +145,28 @@ export const Group = ( props ) => {
             </div>
 
 
-            { !settings && <div style={{ overflow: "auto", display: "flex", flexDirection: "column", flexGrow: "1" }} >
+            { !settings && !fileinputOpener && <div style={{ overflow: "auto", display: "flex", flexDirection: "column", flexGrow: "1" }} >
 
                 <div style={{  display: "flex", flexDirection: "column", flexGrow: "1",  padding: '.5rem', overflow: "auto", backgroundColor: 'var(--color4)' }} >
                     { messages && messages.map( x => <SingleMessage data={x} /> ) } 
                 </div>
 
                 <div id='bottom-bar' style={{ position: 'relative' }} >
-
-                    { mediaURLs && <div id='media' style={{ position: 'absolute', height: '3rem', width: '100%', bottom: '100%', display: 'flex' }} >
-                        { mediaURLs && mediaURLs.map( x => (
-                            <div style={{ width: '3rem', backgroundImage: `url(${x})`, backgroundSize: 'cover' }} >
-
-                            </div>
-                        ) ) }
-                    </div> }                  
-                    
                     <div style={{ color: 'white', cursor: 'pointer' }} onClick={()=> { if(fileinputOpener) setFileinputOpener(false); else setFileinputOpener(true) }}  > + </div>
-
-                    { fileinputOpener && <div style={{ position: 'absolute', left: '0', bottom: '100%', width: '10rem', display: 'flex', flexDirection: 'column-reverse', backgroundColor: 'var(--color3)' }} >
-                        <div className='file-input-container' >
-                            Video
-                            <input className='file-input' accept="video/*" onChange={mediaChange} type='file' multiple  />
-                        </div>
-                        <div className='file-input-container' >
-                            Audio
-                            <input className='file-input' accept="audio/*" onChange={mediaChange} type='file' multiple  />
-                        </div>
-                        <div className='file-input-container' >
-                            Photo
-                            <input className='file-input' accept="image/*" onChange={mediaChange} type='file' multiple  />
-                        </div>
-                        
-                        <div className='file-input-container' >
-                            PDF
-                            <input className='file-input' accept=".pdf" onChange={mediaChange} type='file' multiple  />
-                        </div>
-                    </div> }
-                    
-                    
-                    
                     <input type="text" placeholder="Write Message" style={{padding: ".5rem", height: '100%', flexGrow: '1', backgroundColor: 'var(--color3)', color: 'var(--color2)' }} value={newMessage} onChange={(e)=> setNewMessage(e.target.value)} />
                     <button onClick={sendMessage} style={{ cursor: 'pointer' }}  > Send </button>
                 </div> 
                     
             </div>}
 
-            { settings && <GroupSettings {...props} />}
+            { !settings && fileinputOpener && <FileInput setMessages={setMessages} messages={messages} back={setFileinputOpener} group_id={props.group.group_id} /> }
+
+            { settings  && <GroupSettings {...props} />}
         </>
     )
 }
 
-/*
-
-
-
-
-*/
  
-
-export const Groups = () => {
-
-    const [ selectedGroup, setGroup ] = useState(null)
-    const [ newGroup, setNewGroup ] = useState(null)
-    const { user } = useContext(AuthContext)
-    const [ groups, setGroups ] = useState([])
-    const [ error, setError ] = useState("")
-
-    const createGroup = async () => {
-        
-        try {
-            const response = await api.post( "/chat/creategroup", { newGroup }, 
-            {
-                headers: { 'Authorization': `Bearer ${user.token}` }
-            })
-
-            setNewGroup("")
-            setGroups( [ ...groups, response.data ] )
-            console.log( response.data )
-        } catch (err) {
-            alert( err.response.data.error )
-        }
-    }
-
-    const fetchGroups = async () => {
-
-        try {
-            const response = await api.get( "/chat/fetchgroups", 
-                { headers: { 'Authorization': `Bearer ${user.token}` } }
-            )
-            setGroups( response.data );
-            console.log( response.data );
-        } catch (err) {
-            console.log( err.response.data.error )
-        }
-    }
-
-    useEffect( ()=> {
-        fetchGroups();
-        
-    }, [] )
-
-    const [ groupsOpener, setGroupsOpener  ] = useState(false)
-
-    return (
-        <div id="groups"  >
-            <div id="leftbar"   >
-                <div style={{ textAlign: 'center' }} > 
-                    Create New Group
-
-                </div>
-                 
-                <div style={{ display: 'flex', justifyContent: 'space-evenly', gap: '.5rem', padding: '.5rem' }} > 
-                    <input placeholder="group name" style={{ flexGrow: '1' }} value={newGroup} onChange={ (e)=> setNewGroup(e.target.value) }  />
-                    <button onClick={()=> createGroup()}  > Submit </button>
-                    <span> { error } </span>
-                </div> 
-
-                <div style={{ textAlign: 'center', fontWeight: '600', fontSize: '1.3rem', borderTop: '3px solid var(--color4)' }} >Your Groups
-                    <FontAwesomeIcon icon={faArrowDown} className='icon' style={{ marginLeft: '1rem', cursor: 'pointer' }} 
-                        onClick={() => { if ( groupsOpener ) setGroupsOpener(false); else setGroupsOpener(true) }}
-                    />
-                </div>
-                { groupsOpener && <div  >
-                    
-                    { groups && groups.map( x => (
-                        
-                        <div id={x.group_id} style={{ cursor: 'pointer' }} className="hover1" onClick={() => setGroup(x)} > { x.group_name } </div> 
-                        
-                    ) ) }
-                </div>}
-            </div>
-
-            <div id='rightbar' >
-                {selectedGroup && <Group group={selectedGroup} />}
-            </div>
-        </div>
-    )
-}
-
-
 
 // const mongoose = require('mongoose');
 

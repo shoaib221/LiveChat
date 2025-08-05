@@ -24,6 +24,7 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
 
 	io.on( "connection", async (stream) => {
 		
+		console.log( "socket entry" )
 
 		const auth = stream.handshake.query.auth;
 		

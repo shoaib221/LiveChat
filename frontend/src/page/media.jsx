@@ -6,10 +6,6 @@ import axios from "axios";
 import { AuthContext } from "../context/authContext";
 
 
-const api = axios.create( {
-    baseURL: "http://localhost:4000"
-} )
-
 
 const Image = () => {
     const { user } = useContext(AuthContext)
@@ -21,8 +17,6 @@ const Image = () => {
     const handleChange = (event) => {
         let file = event.target.files[0];
 
-        
-        
         if(file) {
             const reader =new FileReader()
             reader.readAsDataURL( file )

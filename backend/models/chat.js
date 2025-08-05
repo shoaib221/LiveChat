@@ -81,9 +81,12 @@ const GroupMessageSchema = new mongoose.Schema({
     text: {
         type: String
     }, 
-    media: {
+    mediaType: {
         type: String
     },
+    mediaURL: {
+        type: String,
+    }, 
     createdAt: {
         type: String,
         required: true

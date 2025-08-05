@@ -7,7 +7,7 @@ import { Chat } from "./chat";
 import '../styles/groupchat.css';
 import { AuthContext } from "../context/authContext";
 import { SingleMessage } from "./chat";
-import { Groups } from "./Group";
+import { Groups } from "./Groups";
 import { Profile } from "./profile";
 
 const api = axios.create( { baseURL: "http://localhost:4000" } )

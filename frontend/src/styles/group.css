@@ -53,7 +53,7 @@
     max-width: 60%;
     margin-right: auto;
     margin-top: .5rem;
-    
+    overflow: initial;
 }
 
 .sent {
@@ -62,7 +62,7 @@
     max-width: 60%;
     margin-left: auto;
     margin-top: .5rem;
-    
+    overflow: initial;
 }
 
 .photo-1 {
@@ -93,7 +93,7 @@
 
 .file-input-container {
     position: relative;
-    color: white; 
+    color: var(--color5); 
     cursor: pointer; 
     
     border: 1px solid var(--color3);
@@ -111,4 +111,18 @@
     width: 100%;
     cursor: pointer; 
     opacity: 0;
+}
+
+.preview {
+    height: 10rem;
+    width: 10rem;
+    min-width: 10rem;
+    overflow: hidden;
+}
+
+.media {
+    height: 10rem;
+    width: 10rem;
+
+    overflow-x: hidden;
 }

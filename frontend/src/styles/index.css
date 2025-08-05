@@ -16,7 +16,7 @@ input[type="file"]::file-selector-button {
 	margin: 0px;
 	border: 0px;
 	box-sizing: border-box;
-	
+	overflow: auto;
 }
 
 :root {
@@ -24,6 +24,7 @@ input[type="file"]::file-selector-button {
 	--color2 : white;
 	--color3 : rgb(0, 24, 59);
 	--color4:  rgb(0, 43, 108) ;
+	--color5: rgb(168, 164, 164);
 }
 
 html {
@@ -33,7 +34,7 @@ html {
 	min-width: 680px;
 	min-height: 500px;
 	overflow: auto;
-	color: black;
+	color: white;
 }
 
 body {

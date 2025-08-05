@@ -1,12 +1,14 @@
 
 
 import { createContext, useReducer, useEffect, useState } from 'react';
+import { io } from "socket.io-client";
 import { initURL } from '../urls';
 
 export const AuthContext = createContext();
 
 
 export const authReducer = (state, action) => {
+    
     if (action.type === 'LOGIN') return { user: action.payload };
     else if ( action.type === 'LOGOUT' ) return { user: null };
     else return state;
@@ -15,7 +17,17 @@ export const authReducer = (state, action) => {
 export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, { user: null });
     const [ socket, setSocket ] = useState(null);
-    const [ onlineUsers, setOnlineUsers ] = useState(null);
+
+    function connectSocket () {
+        
+        const client = io( 'http://localhost:4000', {
+            query: {
+                auth: `Bearer ${state.user.token}`
+            }
+        } )
+        setSocket( client );
+    }
+    
 
     async function  Init() {
         
@@ -29,7 +41,10 @@ export const AuthContextProvider = ({ children }) => {
             });
             
             const json = await response.json();
-            if( response.ok ) dispatch({ type: 'LOGIN', payload: user });
+            if( response.ok ) {
+                dispatch({ type: 'LOGIN', payload: user }); 
+                
+            }
             else 
             {
                 localStorage.removeItem('user');
@@ -40,7 +55,13 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
-    useEffect(() => {  Init(); }, [])
+    useEffect(() => {  
+        Init();
+    }, [])
+
+    useEffect(() => {
+        if( state.user ) connectSocket();
+    }, [state.user] )
 
     //console.log('AuthContext state:', state)
     
