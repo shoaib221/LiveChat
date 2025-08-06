@@ -26,7 +26,8 @@ export const Groups = () => {
             setGroups( [ ...groups, response.data ] )
             console.log( response.data )
         } catch (err) {
-            alert( err.response.data.error )
+            if(err.response) alert( err.response.data.error )
+            else alert( err.message )
         }
     }
 
@@ -58,13 +59,13 @@ export const Groups = () => {
 
                 </div>
                  
-                <div style={{ display: 'flex', justifyContent: 'space-evenly', gap: '.5rem', padding: '.5rem' }} > 
-                    <input placeholder="group name" style={{ flexGrow: '1' }} value={newGroup} onChange={ (e)=> setNewGroup(e.target.value) }  />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', gap: '.5rem', padding: '.5rem' }} > 
+                    <input placeholder="group name" style={{ padding: '.5rem' }} value={newGroup} onChange={ (e)=> setNewGroup(e.target.value) }  />
                     <button onClick={()=> createGroup()}  > Submit </button>
                     <span> { error } </span>
                 </div> 
 
-                <div style={{ textAlign: 'center', fontWeight: '600', fontSize: '1.3rem', borderTop: '3px solid var(--color4)' }} >Your Groups
+                <div style={{ textAlign: 'center', borderTop: '3px solid var(--color4)' }} >Your Groups
                     <FontAwesomeIcon icon={faArrowDown} className='icon' style={{ marginLeft: '1rem', cursor: 'pointer' }} 
                         onClick={() => { if ( groupsOpener ) setGroupsOpener(false); else setGroupsOpener(true) }}
                     />
@@ -73,7 +74,7 @@ export const Groups = () => {
                     
                     { groups && groups.map( x => (
                         
-                        <div id={x.group_id} style={{ cursor: 'pointer' }} className="hover1" onClick={() => setGroup(x)} > { x.group_name } </div> 
+                        <div id={x.group_id} style={{ cursor: 'pointer', color: 'var(--color5)' }} className="hover1" onClick={() => setGroup(x)} > { x.group_name } </div> 
                         
                     ) ) }
                 </div>}

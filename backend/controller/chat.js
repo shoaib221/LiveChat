@@ -240,11 +240,11 @@ const message_file_upload = multer({ storage: multer.diskStorage({
 
 
 const GroupMessageCont = async ( req, res, next ) => {
-	
+	console.log("here")
 	try {
 		const { text,  group_id } = req.body
 		let messages = []
-		console.log( req.files )
+		//console.log( req.files )
 		if(text) messages.push( new GroupMessage({ text, sender: req.username , group_id, createdAt: new Date().toLocaleString() }) )
 		
 		for( let key in req.files ) {
@@ -272,11 +272,13 @@ const GroupMessageCont = async ( req, res, next ) => {
 		console.log("group message");
 
 		const group_members = await GroupMembers.find( { group_id } )
+
+		console.log( "online", onlineUserMap );
 						
 		group_members.forEach(x => {
-			// console.log(x)
+			console.log(x)
 			if( onlineUserMap[x.member] ) 
-				//console.log("got it")
+				console.log(x.member)
 				io.to( onlineUserMap[x.member] ).emit( "newGroupMessage", saved_messages )
 		})
 		res.status(200).json("ok")

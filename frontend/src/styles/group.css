@@ -16,7 +16,7 @@
 
 #rightbar {
     flex-grow: 1;
-    border-left: .1px solid var(--color2);
+    border-left: 2px solid var(--color4);
     display: flex;
     flex-direction: column;
 }
@@ -24,8 +24,8 @@
 #rightbar-nav {
     display: flex;
     background-color: var(--color3);
-    height: 3rem;
-    min-height: 3rem;
+    height: 2rem;
+    min-height: 2rem;
 }
 
 #bottom-bar {
@@ -54,6 +54,7 @@
     margin-right: auto;
     margin-top: .5rem;
     overflow: initial;
+    
 }
 
 .sent {
@@ -63,6 +64,7 @@
     margin-left: auto;
     margin-top: .5rem;
     overflow: initial;
+    
 }
 
 .photo-1 {
@@ -96,12 +98,8 @@
     color: var(--color5); 
     cursor: pointer; 
     
-    border: 1px solid var(--color3);
 }
 
-.file-input-container:hover {
-    border: 1px solid var(--color2);
-}
 
 .file-input {
     position: absolute;
@@ -123,6 +121,10 @@
 .media {
     height: 10rem;
     width: 10rem;
-
     overflow-x: hidden;
 }
+
+audio.media {
+    height: 3rem;
+}
+

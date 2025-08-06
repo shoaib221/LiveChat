@@ -35,6 +35,7 @@ html {
 	min-height: 500px;
 	overflow: auto;
 	color: white;
+	background-color: var(--color3);
 }
 
 body {
@@ -71,4 +72,33 @@ input {
 #home a {
 	text-align: center;
 	margin: 1rem;
+}
+
+/* Styling the entire scrollbar */
+::-webkit-scrollbar {
+  width: 10px; /* Adjust width for vertical scrollbar */
+  height: 10px; /* Adjust height for horizontal scrollbar */
+}
+
+/* Styling the scrollbar track */
+::-webkit-scrollbar-track {
+  background: rgb(0,0,0,0);
+  border-radius: 5px;
+}
+
+/* Styling the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: rgb(255,255,255,0.2);
+  border-radius: 5px;
+}
+
+/* Styling the scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(255,255,255,1);
+}
+
+.center-content {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
