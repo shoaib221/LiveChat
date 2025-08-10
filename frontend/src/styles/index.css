@@ -46,14 +46,16 @@ body {
 button {
 	background-color: var(--color3);
 	border: 1px solid var(--color3);
+	border-radius: .2rem;
 	color: var(--color2);
 	font-family: "Rancho", cursive;
 	padding: .25rem;
 	margin: .25rem;
+	cursor: pointer;
 }
 
 button:hover {
-	border: 1px solid var(--color2);
+	background-color: var(--color4);
 }
 
 input {
@@ -65,8 +67,13 @@ input {
 	height: 100%;
 	width: 100%;
 	display: flex;
+}
+
+nav {
+	display: flex;
+	justify-content: space-evenly;
 	flex-direction: column;
-	color: black;
+	min-width: 3rem;
 }
 
 #home a {
@@ -90,6 +97,7 @@ input {
 ::-webkit-scrollbar-thumb {
   background: rgb(255,255,255,0.2);
   border-radius: 5px;
+  cursor: pointer;
 }
 
 /* Styling the scrollbar thumb on hover */
@@ -101,4 +109,34 @@ input {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.register {
+	
+	border: 3px solid var(--color4);
+	padding: .5rem;
+	display: flex;
+	flex-direction: column;
+	width: 15rem;
+	gap: 1rem;
+}
+
+.register input {
+	padding: .5rem;
+	border-radius: .5rem;
+}
+
+.auth {
+	
+	justify-content: center;
+	align-items: center;
+	display: flex;
+}
+
+.hover1:hover {
+	background-color: var(--color4);
+}
+
+.navop {
+	padding: .3rem;
 }

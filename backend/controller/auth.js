@@ -55,6 +55,7 @@ const Register = async ( req, response, nect ) => {
 
 
 const Login = async ( request, response, next ) => {
+    console.log("login");
     const { email, password } = request.body;
     
     try {

@@ -12,7 +12,7 @@ const { requireAuth } = require("./middlewire.js");
 const { oauth2Client } = require("../utils/googleClient.js");
 const multer = require('multer');
 
-const { Message, Group, GroupMessage, GroupMembers } = require("../models/chat.js");
+const { Message, Group, GroupMessage, GroupMembers, Story } = require("../models/chat.js");
 const { cloudinary } = require("../utils/cloudinary.js");
 const { use } = require("react");
 const fetch = require("node-fetch");
@@ -26,12 +26,11 @@ const {  io, onlineUserMap } = require('../utils/socket.js')
 const fetchMessage  = async ( req, res, next ) => {
 	console.log("fetch message");
 
-
 	try {
 		const {receiver} = req.body;
 		const sender = req.username;
 
-		console.log( sender, receiver );
+		//console.log( sender, receiver );
 		const messages = await Message.find({
 			$or: [
 				{ receiver: receiver, sender: sender },
@@ -67,28 +66,28 @@ const sendMessage = async ( req, res, next ) => {
 		})
 		
 		const saved_message = await new_message.save();
-		console.log("here", saved_message);
+		//console.log("here", saved_message);
 		
 		const receiver_socket_id = onlineUserMap[receiver]
 
-		console.log( "receiver", receiver_socket_id )
+		//console.log( "receiver", receiver_socket_id )
 		
 		if( receiver_socket_id ) io.to( receiver_socket_id ).emit( "newMessage", saved_message );
 		res.status(200).json(saved_message)
 		next();
 	} catch (err) {
-		console.log(err.message);
+		//console.log(err.message);
 		res.status(400).json( {error: err.message} );
 	}
 }
 
 
 const FetchUsers = async ( req, res, next ) => {
-
+	console.log("fetch users")
 	try {
-		console.log( req.username )
+		//console.log( req.username )
 		const users = await User.find( { username: { $ne: req.username } } )
-		console.log( users )
+		//console.log( users )
 		res.status(200).json( { users } )
 		next()
 	} catch (err) {
@@ -131,7 +130,7 @@ const createGroup = async (req, res, next) => {
 
 
 const FetchGroups = async ( req, res, next  ) => {
-
+	console.log("fetch groups")
 	try {
 		const groups = await GroupMembers.find( { member: req.username } )
 		//console.log(groups)
@@ -169,7 +168,7 @@ const AddToGroup = async ( req, res, next  ) => {
 
 
 const DeleteFromGroup = async ( req, res, next ) => {
-
+	console.log( "delete from group" )
 	try {
 		const { group_id, member } = req.body
 		await GroupMembers.deleteOne({ group_id, member })
@@ -184,7 +183,7 @@ const DeleteFromGroup = async ( req, res, next ) => {
 
 
 const FetchGroupMembers = async ( req, res, next ) => {
-	//console.log("fetch members")
+	console.log("fetch group members")
 	try {
 		const { group_id, member } = req.body
 		const data = await GroupMembers.find({ group_id })
@@ -195,6 +194,7 @@ const FetchGroupMembers = async ( req, res, next ) => {
 }
 
 const DeleteGroup = async (req, res, next) => {
+	console.log("delete group")
 	try {
 		const { group_id } =req.body
 		await Group.deleteOne( { _id: group_id } )
@@ -208,7 +208,7 @@ const DeleteGroup = async (req, res, next) => {
 
 
 const FetchGroupMessage =  async ( req, res, next ) => {
-
+	console.log( "fetch group message" );
 	try {
 		const { group_id } = req.body
 		const messages = await GroupMessage.find( { group_id } )
@@ -220,6 +220,7 @@ const FetchGroupMessage =  async ( req, res, next ) => {
 }
 
 const LeaveGroup = async (req, res, next) => {
+	console.log( "leave group" )
 	try {
 		const { group_id } =req.body
 		await GroupMembers.deleteOne( { member : req.username } );
@@ -240,7 +241,7 @@ const message_file_upload = multer({ storage: multer.diskStorage({
 
 
 const GroupMessageCont = async ( req, res, next ) => {
-	console.log("here")
+	console.log("group message cont")
 	try {
 		const { text,  group_id } = req.body
 		let messages = []
@@ -249,6 +250,8 @@ const GroupMessageCont = async ( req, res, next ) => {
 		
 		for( let key in req.files ) {
 			for( item of req.files[key] ) {
+				//console.log(item)
+
 				messages.push( new GroupMessage({
 					sender: req.username, 
 					group_id,
@@ -259,26 +262,26 @@ const GroupMessageCont = async ( req, res, next ) => {
 			}
 		}
 
-		
 
 		let saved_messages = []
 		for( let i=0; i<messages.length; i++ )
 		{
 			let result = await messages[i].save()
-			console.log(result)
+			//console.log(result)
 			saved_messages.push( result )
 		}
 
-		console.log("group message");
+		//console.log("group message");
 
 		const group_members = await GroupMembers.find( { group_id } )
 
-		console.log( "online", onlineUserMap );
-						
+		//console.log( "online", onlineUserMap );
+		
+
 		group_members.forEach(x => {
-			console.log(x)
+			//console.log(x)
 			if( onlineUserMap[x.member] ) 
-				console.log(x.member)
+				//console.log(x.member)
 				io.to( onlineUserMap[x.member] ).emit( "newGroupMessage", saved_messages )
 		})
 		res.status(200).json("ok")
@@ -293,23 +296,50 @@ const GroupMessageCont = async ( req, res, next ) => {
 }
 
 
+const CreateStory = async ( req, res, next ) => {
+	console.log("create story")
+	try {
+		const { text } = req.body;
+		console.log(text)
+		let story = null;
+		console.log(story)
+		if( text ) {
+			story = new Story( { owner: req.username, type: "text", url: text } )
+			story = await story.save()
+		}
+		else if( req.files.length >0 ) {
+			story = new Story( { owner: req.username, 
+				type: req.files[0].mimetype, 
+				url: "http://localhost:4000/messages/"+req.files[0].filename } )
+			
+			story = await story.save()
+		}
+		
+		res.status(200).json(story)
+	} catch (err) {
+		console.log( err.message )
+		res.status(400).json( { error: err.message } )
+	}
+}
+
 
 chatRouter.use( requireAuth );
 chatRouter.post( "/fetchmessage", fetchMessage);
 chatRouter.post( "/sendmessage", message_file_upload.single('photo'), sendMessage );
 chatRouter.get( "/users", FetchUsers );
-chatRouter.post( "/creategroup", createGroup  );
+chatRouter.post( "/creategroup", createGroup );
 chatRouter.get( "/fetchgroups", FetchGroups );
 chatRouter.post( "/addtogroup", AddToGroup );
 chatRouter.post( "/fetchgroupmembers", FetchGroupMembers );
 chatRouter.post( "/deletemember", DeleteFromGroup );
-chatRouter.post( "/deletegroup", DeleteGroup)
-chatRouter.post( "/leavegroup", LeaveGroup)
+chatRouter.post( "/deletegroup", DeleteGroup);
+chatRouter.post( "/leavegroup", LeaveGroup);
 chatRouter.post( "/fetchgroupmessage", FetchGroupMessage );
 chatRouter.post("/group_message", message_file_upload.fields([
 		{ name: 'photo', maxCount: 5 }, { name: 'audio', maxCount: 5 }, { name: 'video', maxCount: 5 }, { name: 'pdf', maxCount: 5 }
 	]), GroupMessageCont );
-
+chatRouter.post( "/create-story", message_file_upload.array('media'), 
+	CreateStory )
 
 
 module.exports = { chatRouter };

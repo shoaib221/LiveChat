@@ -1,10 +1,12 @@
+
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/authContext";
+import { api } from "../api";
+import { useAuth } from "../hooks/auth";
 
-import axios from "axios";
 import '../styles/profile.css';
 
-const api = axios.create( { baseURL: "http://localhost:4000" } )
+
 
 export const Profile = () => {
     const { user } = useContext(AuthContext)
@@ -14,6 +16,7 @@ export const Profile = () => {
     const [ imageurl, setImageurl ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
     const [error, setError]  = useState(null)
+    const { logout } = useAuth()
     
     const imageChange = ( event ) => {
         let file = event.target.files[0];
@@ -55,15 +58,11 @@ export const Profile = () => {
                 }
                 
             )
-            
             alert("Successfully Updated");
-            
-        
+
         } catch (err) {
             alert( err.response.data.error )
         }
-
-
     }
 
     useEffect( () => {
@@ -74,35 +73,32 @@ export const Profile = () => {
         <div className="profile" style={{ color: '#ffffffff', width: '50%', marginLeft: 'auto', marginRight: 'auto' }} >
             
             <div className="profile-photo"
-                style={{ border: '1px solid white', backgroundImage: `url(${imageurl})` , height: '10rem', width: '10rem', backgroundSize: 'cover', backgroundPosition: 'center',
-                        marginLeft: 'auto', marginRight: 'auto'  }}
+                style={{ borderRadius: '50%', backgroundImage: `url(${imageurl})` , height: '10rem', width: '10rem', backgroundSize: 'cover', backgroundPosition: 'center',
+                    marginLeft: 'auto', marginRight: 'auto', position: 'relative', overflow: 'initial'  }}
             >
+                <div style={{ position: 'absolute', top: '50%', right: '-3px', cursor: 'pointer' }} >
+                    +
+                    <input type="file" onChange={imageChange} style={{  opacity: '0', position: "absolute", top: '0', left: '0', height: '100%', width: '100%' }} />
+                </div>
             </div>
 
+            <div style={{ textAlign: "center" }} > {username}
+                <button onClick={logout} > Logout </button>
+            </div>
             
 
-            <div style={{ textAlign: "center" }} > {username}  </div>
-
-            
-            
-            
             <div className="grid-container"
-                style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', textAlign: 'center', gap: '.5rem', marginTop: '3rem' }}
+                style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', textAlign: 'center', gap: '.5rem', marginTop: '3rem', padding: '.5rem', color: 'var(--color5)' }}
             >
                 <div> Name </div>
                 <input value={name} onChange={ (e) => setName( e.target.value ) } />
                 
-
                 <div> Description </div>
                 <input value={description} onChange={ (e) => setDescription( e.target.value ) } />
-                
-
-                <div> Upload Image </div>
-                <input type="file" onChange={imageChange} style={{ cursor: 'pointer' }} />
             
             </div>
 
-            <div onClick={UpdateProfile} style={{ cursor: 'pointer', textAlign: 'center' }} > Update </div>
+            <div className="hover1" onClick={UpdateProfile} style={{ cursor: 'pointer', textAlign: 'center' }} > Update </div>
 
             
         </div>

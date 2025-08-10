@@ -1,8 +1,7 @@
 
 
 import { useState, useEffect } from "react";
-import { registerURL, loginURL, logoutURL } from "./urls.js";
-import { useLogin, useSignup } from "./hooks/auth.js";
+import { useAuth } from "./hooks/auth.js";
 import { Link } from "react-router-dom";
 import { GoogleAuth } from "./GoogleAuth.jsx";
 
@@ -12,7 +11,7 @@ const Login = () => {
     const [ loading, setLoading ] = useState(false);
     const [ email, setEmail ] = useState("");
     const [ password, setPassword ] = useState("");
-    const {login} = useLogin();
+    const {login} = useAuth();
 
 
     const handleSubmit = async (event) => {
@@ -26,7 +25,8 @@ const Login = () => {
             setPassword("");
         }
         catch (err) {
-            setError( err.message );
+            if( err.message ) alert(err.message);
+            else alert( err.response.data.error )
         } finally {
             setLoading(false);
         }
@@ -34,25 +34,17 @@ const Login = () => {
 
 
     return (
-        <div className="register flex-column" >
-            
-            
-            <h3>Login</h3>
-
+        <div className="register" style={{ overflow: 'initial' }} >
             { error && <div>  { error } </div> }
+            <div style={{ textAlign: 'center' }} > Login </div>
 
-            <div className="flex-row" style={{ height: "40px", width: "300px" }} >
-                
-                <input 
-                    type="email" 
-                    onChange={(e) => setEmail(e.target.value)} 
-                    value={email}
-                    placeholder="Email" 
-                />
-            </div>
-            
-
-            <div className="flex-row" style={{ height: "40px", width: "300px" }} >
+            <input 
+                type="email" 
+                onChange={(e) => setEmail(e.target.value)} 
+                value={email}
+                placeholder="Email" 
+            />
+        
             <input 
                 type="password" 
                 onChange={(e) => setPassword(e.target.value)} 
@@ -60,10 +52,9 @@ const Login = () => {
                 placeholder="Password" 
             />
 
-            </div>
-
             { !loading && <button onClick={handleSubmit} > Submit </button> }
             
+            <GoogleAuth />
         
         </div>
     )
@@ -71,7 +62,7 @@ const Login = () => {
 
 
 const Register = () => {
-    const { signup } = useSignup();
+    const { signup } = useAuth();
     const [ email, setEmail ] = useState("");
     const [ password, setPassword ] = useState("");
     const [ error, setError ] = useState( null );
@@ -96,34 +87,36 @@ const Register = () => {
     }
 
     return (
-        <div className="register flex-column" >
+        <div className="register" >
             { error && <p>  { error } </p> }
+        
+            <div style={{ textAlign: 'center' }} >Register</div>
+
+            <input 
+                type="text"
+                placeholder="Your Full Name" 
+            />
             
-                <h3>Register</h3>
-                
-                <div className="flex-row" style={{ height: "40px", width: "300px" }} >
-                    
-                    <input 
-                        type="email" 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        value={email}
-                        placeholder="Email" 
-                    />
-                </div>
-                
+            <input 
+                type="email" 
+                onChange={(e) => setEmail(e.target.value)} 
+                value={email}
+                placeholder="Email" 
+            />
+            
+            <input 
+                type="password" 
+                onChange={(e) => setPassword(e.target.value)} 
+                value={password}
+                placeholder="Password" 
+            />
 
-                <div className="flex-row" style={{ height: "40px", width: "300px" }} >
-                <input 
-                    type="password" 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    value={password}
-                    placeholder="Password" 
-                />
+            
 
-                </div>
+            { !loading && <button onClick={handleSubmit} > Submit </button> }
 
-                { !loading && <button onClick={handleSubmit} > Submit </button> }
-                
+            <GoogleAuth />
+            
             
         </div>
     )
@@ -157,13 +150,10 @@ export const Auth = () => {
             { login && <Login/> }
             { !login && <Register /> }
 
-            <div style={{ display: "block", width: "100%", height: "100%", textAlign: "center" }} >
+            <div style={{ display: "block",  textAlign: "center" }} >
                 <button style={{ width: "70px" }} onClick={onChange} > { option } </button>
-                Or 
-                <GoogleAuth />
+                
             </div>
-
-            
 
         </div>
     )

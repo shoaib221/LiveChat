@@ -86,13 +86,34 @@ const GroupMessageSchema = new mongoose.Schema({
     },
     mediaURL: {
         type: String,
-    }, 
+    },
     createdAt: {
         type: String,
         required: true
     }
 })
 
+
 const GroupMessage = mongoose.model("GroupMessage", GroupMessageSchema );
 
-module.exports = { Message, Group, GroupMessage, GroupMembers };
+
+const StorySchema = new mongoose.Schema({
+    owner: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    url: {
+        type: String,
+        required: true
+    }
+}, { timestamps: true } )
+
+
+const Story = mongoose.model("Story", StorySchema );
+
+
+module.exports = { Message, Group, GroupMessage, GroupMembers, Story };

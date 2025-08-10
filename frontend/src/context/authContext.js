@@ -2,15 +2,20 @@
 
 import { createContext, useReducer, useEffect, useState } from 'react';
 import { io } from "socket.io-client";
-import { initURL } from '../urls';
+import { api } from '../api';
 
 export const AuthContext = createContext();
 
 
 export const authReducer = (state, action) => {
-    
-    if (action.type === 'LOGIN') return { user: action.payload };
-    else if ( action.type === 'LOGOUT' ) return { user: null };
+    if (action.type === 'LOGIN') {
+        localStorage.setItem('user', JSON.stringify(action.payload));
+        return { user: action.payload };
+    }
+    else if ( action.type === 'LOGOUT' ) {
+        localStorage.removeItem('user');
+        return { user: null };
+    }
     else return state;
 }
 
@@ -35,23 +40,14 @@ export const AuthContextProvider = ({ children }) => {
             const user = JSON.parse(localStorage.getItem('user'));
             if(!user) return;
             
-            
-            const response = await fetch(initURL, {
-                headers: {'Authorization': `Bearer ${user.token}`} 
+            const response = await api.get("/auth/init", {
+                headers: {'Authorization': `Bearer ${user.token}`}
             });
-            
-            const json = await response.json();
-            if( response.ok ) {
-                dispatch({ type: 'LOGIN', payload: user }); 
-                
-            }
-            else 
-            {
-                localStorage.removeItem('user');
-                dispatch( { type: 'LOGOUT' } );
-            }
+            dispatch({ type: 'LOGIN', payload: user });
+
         } catch (err) {
-            console.error(err.message);
+            dispatch( { type: 'LOGOUT' } );
+            if(err.message) alert(err.message);
         }
     }
 

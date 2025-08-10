@@ -42,20 +42,10 @@ export const ChatHead = () => {
 
     return (
         <div id="chathead"  >
-            <nav >
-                <div className="navop" onClick={()=> setOption("chat")} > Chat </div>
-                <div className="navop" onClick={()=> setOption("groups")} > Groups   </div>
-                <div className="navop" onClick={() => setOption('contacts') } > Contacts </div>
-                <div className="navop" onClick={() => setOption('profile') } > Profile </div>
-                <div className="navop" onClick={() => setOption('settings') } > Settings </div>
-                
-            </nav>
+            
 
 
-            { option ==="chat" && <Chat />  }
-            { option ==="contacts" && <Contacts /> }
-            { option ==="groups" && <Groups /> }
-            { option === 'profile' && <Profile /> }
+            
         
         </div>
     )
