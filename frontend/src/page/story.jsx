@@ -1,7 +1,7 @@
 import '../styles/story.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAdd }  from '@fortawesome/free-solid-svg-icons'
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 
 
 import { api } from '../api'
@@ -32,17 +32,17 @@ export const CreateStory = (props) => {
     }
 
     const submit = async () => {
-        if( media.type === "text" && media.url==="" ) 
-        {
+        if( media.type === "text" && media.url==="" ) {
             alert("Empty Story Not Allowed")
             return
         }
         try {
+
             let formdata = new FormData()
             if( media.type === "text" ) formdata.append( media.type, media.url )
             else formdata.append( 'media', media.file )
 
-            console.log(formdata, media.type)
+            //console.log(formdata, media.type)
 
             const response = await api.post( "/chat/create-story", formdata, 
                 { headers: { 'Authorization': `Bearer ${user.token}` } }
@@ -52,11 +52,9 @@ export const CreateStory = (props) => {
             setMedia({ type: "text", file: null, url: "" });
             document.getElementById('create-story').style.display='none'
 
-
         } catch (err) {
             if( err.response ) alert( err.response.data.error );
             else alert( err.message );
-            
         }
     }
 
@@ -86,11 +84,48 @@ export const CreateStory = (props) => {
 }
 
 
-export const StoryItem =  (props) => {
+
+
+
+export const StoryBoard = (props) => {
+
+    const [ curStory, setCurStory ] = useState(null);
+    const lap = 2000;
+
+    function roller () {
+        
+        setTimeout(()=> {
+            if( curStory < props.stories.length - 1 )
+                setCurStory( curStory+1 )
+            else{
+                setCurStory(null)
+                props.setStart(null)
+            }
+        }, lap)
+
+    }
+
+    useEffect(()=> {
+        if(curStory!== null) roller();
+    }, [curStory])
+
+    useEffect(() => {
+        setCurStory( props.start )
+    }, [])
 
     return (
-        <div>
-            { props.story.type }
+        <div id='story-board' >
+            <div onClick={()=> props.setStart(null) } style={{ position: 'absolute', right: '0' }} >X</div>
+            { curStory === null ? <p>'Loading...'</p> : 
+                <>
+
+                    { props.stories[curStory].type ==='text' ? <p> { props.stories[curStory].url } </p> : <></> }
+                    { props.stories[curStory].type === 'image' ? <img src={props.stories[curStory].url}  /> : <></> }
+                    { props.stories[curStory].type === 'video' ? <video src={props.stories[curStory].url } /> : <></> }
+                </>
+            }
+            
+            <div id='progress-bar'></div>
         </div>
     )
 }
@@ -98,20 +133,66 @@ export const StoryItem =  (props) => {
 
 export const Story = () => {
     const [ stories, setStories ] = useState([])
+    const { user } = useContext(AuthContext)
+    const [ start, setStart ] = useState(null)
 
     const AddStory = ( data ) => {
         setStories([ ...stories, data ])
     }
 
+    const FetchStory = async (  ) => {
+
+        try {
+            let response = await api.get( "/chat/fetch-story", 
+                { headers: { 'Authorization': `Bearer ${user.token}` } }
+            )
+            setStories(response.data);
+        } catch(err) {
+            if( err.response ) alert( err.response.data.error );
+            else alert( err.message );
+        }
+    }
+
+    useEffect(() => {
+        FetchStory();
+    }, [])
+
 
     return (
         <div id='story' >
             <CreateStory  AddStory={AddStory} />
+            { start === null?  <></> :  <StoryBoard stories={stories} start={start} setStart={setStart} /> }
             <div id='create' onClick={ ()=> document.getElementById('create-story').style.display='flex' }  >
                 <FontAwesomeIcon icon={faAdd} />
             </div>
-            { stories && stories.map( item => <StoryItem story={item} /> ) }
+            { stories && stories.map( (item , index) => (
+                <div className='story-item' onClick={()=> setStart(index) } >
+                { item.type === "text" && <p className='story-item' > { item.url } </p> }
+                { item.type === "image" && <img className='story-item' src={ item.url} alt="photo" /> }
+                { item.type === "video" && <video className='story-item' src={ item.url}  /> }
+                </div>
+            ) ) }
 
         </div>
     )
 }
+
+
+
+// let counter = 0;
+
+// function incrementCounter() {
+//   console.log("Counter:", counter);
+//   counter++;
+// }
+
+// // Start the interval, calling incrementCounter every 1000 milliseconds (1 second)
+// const intervalID = setInterval(incrementCounter, 1000);
+
+// // Stop the interval after 5 seconds (5000 milliseconds)
+// setTimeout(() => {
+//   clearInterval(intervalID);
+//   console.log("Interval stopped.");
+// }, 5000);
+
+

@@ -309,7 +309,7 @@ const CreateStory = async ( req, res, next ) => {
 		}
 		else if( req.files.length >0 ) {
 			story = new Story( { owner: req.username, 
-				type: req.files[0].mimetype, 
+				type: req.files[0].mimetype.substr(0,5) , 
 				url: "http://localhost:4000/messages/"+req.files[0].filename } )
 			
 			story = await story.save()
@@ -320,6 +320,19 @@ const CreateStory = async ( req, res, next ) => {
 		console.log( err.message )
 		res.status(400).json( { error: err.message } )
 	}
+}
+
+
+const FetchStory = async ( req, res, next ) => {
+
+	try {
+		let stories = await Story.find({});
+		res.status(200).json(stories);
+	} catch (err) {
+		res.status(400).json({ error: err.message });
+	}
+
+
 }
 
 
@@ -340,6 +353,7 @@ chatRouter.post("/group_message", message_file_upload.fields([
 	]), GroupMessageCont );
 chatRouter.post( "/create-story", message_file_upload.array('media'), 
 	CreateStory )
+chatRouter.get( "/fetch-story", FetchStory );
 
 
 module.exports = { chatRouter };

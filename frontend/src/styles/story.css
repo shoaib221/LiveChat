@@ -2,7 +2,7 @@
 #story {
     display: flex;
     height: 10rem;
-    border: 1px solid white;
+    
     width: 100%;
 }
 
@@ -26,6 +26,7 @@
     flex-direction: column;
     align-items: center;
     gap: .5rem;
+    z-index: 10;
 }
 
 
@@ -47,8 +48,6 @@
 
 #create-story .special {
     height: 10rem;
-    
-    
 }
 
 #create-story textarea:focus {
@@ -63,4 +62,35 @@
     width: 100%;
     height: 100%;
     cursor: pointer;
+}
+
+.story-item {
+    min-width: 8rem;
+    cursor: pointer;
+    /* border: 1px solid white; */
+}
+
+#story-board {
+    
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    background-color: black;
+}
+
+@keyframes anim1 {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+#progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 21;
+    animation: anim1 2s linear  infinite;
+    background-color: white;
+    height: 1rem;
 }
