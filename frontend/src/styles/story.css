@@ -2,8 +2,8 @@
 #story {
     display: flex;
     height: 10rem;
-    
     width: 100%;
+    gap: .2rem;
 }
 
 #create {
@@ -67,6 +67,14 @@
 .story-item {
     min-width: 8rem;
     cursor: pointer;
+    width: 8rem;
+    height: 100%;
+    overflow: hidden;
+    box-shadow: .1rem .1rem .1rem var(--color4);
+    padding: .3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     /* border: 1px solid white; */
 }
 
@@ -78,6 +86,17 @@
     left: 0;
     top: 0;
     background-color: black;
+}
+
+.story-board-item {
+    width: 80vw;
+    height: 80vh;
+    position: fixed;
+    top: 10vh;
+    left: 10vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 @keyframes anim1 {
@@ -92,5 +111,5 @@
     z-index: 21;
     animation: anim1 2s linear  infinite;
     background-color: white;
-    height: 1rem;
+    height: .2rem;
 }

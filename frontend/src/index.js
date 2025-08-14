@@ -25,6 +25,8 @@ import { Test } from './test.jsx';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Groups } from './page/Groups.jsx';
 import { Story } from './page/story.jsx';
+import { Feed } from './page/Feed.jsx';
+
 
 const Nantu = () => {
 	
@@ -47,6 +49,7 @@ const Home = () => {
                 <div className="navop" onClick={()=> navigate("/groups")} > Groups   </div>
                 <div className='navop' onClick={()=> navigate('/profile') }  > Profile </div>
                 <div className='navop' onClick={()=> navigate('/story') }  > Story </div>
+				<div className='navop' onClick={()=> navigate('/feed') }  > Feed </div>
             </nav>
 			
 			<Outlet />
@@ -67,6 +70,7 @@ function App() {
 					<Route path='groups/' element={ <Groups /> }  ></Route>
 					<Route path='profile/' element={ <Profile /> } ></Route>
 					<Route path='story/' element={ <Story /> } ></Route>
+					<Route path='feed/' element={ <Feed /> } ></Route>
 				</Route>
 				<Route exact path='/auth' element={ user ? <Navigate to="/" /> : <Auth /> } >  </Route>
 				<Route exact path='/google-auth' element={ user ? <Navigate to="/" /> : <GoogleAuth /> } >  </Route>

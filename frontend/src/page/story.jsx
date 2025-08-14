@@ -84,7 +84,31 @@ export const CreateStory = (props) => {
 }
 
 
+export const ProgressBar = () => {
+    
+    const submit = () => {
+        let elem= document.getElementById('bar');
+        let x=0;
+        let int1 = null;
 
+        function aha1 () {
+            if( x<100 ) x++;
+            else x=0;
+            elem.style.width = `${x}%`;
+        }
+        int1= setInterval( aha1, 20 );
+    }
+
+    useEffect(() => {
+        submit();
+    },[])
+
+    return (        
+        <div id='bar' style={{ backgroundColor: 'white', height: '.2rem', position: 'absolute', top: '0', left: '0' }} >
+            
+        </div>
+    )
+}
 
 
 export const StoryBoard = (props) => {
@@ -93,16 +117,13 @@ export const StoryBoard = (props) => {
     const lap = 2000;
 
     function roller () {
+        if( curStory >= props.stories.length ) {
+            props.setStart(null)
+            return
+        }
+        if( props.stories[curStory].type === 'video' ) return;
         
-        setTimeout(()=> {
-            if( curStory < props.stories.length - 1 )
-                setCurStory( curStory+1 )
-            else{
-                setCurStory(null)
-                props.setStart(null)
-            }
-        }, lap)
-
+        setTimeout(()=> setCurStory( curStory+1 ) , lap);
     }
 
     useEffect(()=> {
@@ -116,16 +137,20 @@ export const StoryBoard = (props) => {
     return (
         <div id='story-board' >
             <div onClick={()=> props.setStart(null) } style={{ position: 'absolute', right: '0' }} >X</div>
-            { curStory === null ? <p>'Loading...'</p> : 
+            { curStory === null || curStory >= props.stories.length ? <p>'Loading...'</p> : 
                 <>
+                    { props.stories[curStory].type ==='text' ? <p className='story-board-item' > { props.stories[curStory].url } </p> : <></> }
+                    { props.stories[curStory].type === 'image' ? <img className='story-board-item' src={props.stories[curStory].url}  /> : <></> }
+                    { props.stories[curStory].type === 'video' ? <video className='story-board-item' src={props.stories[curStory].url } autoPlay controls 
+                        onEnded={ ()=> setCurStory( curStory+1 ) } /> : <></> }
 
-                    { props.stories[curStory].type ==='text' ? <p> { props.stories[curStory].url } </p> : <></> }
-                    { props.stories[curStory].type === 'image' ? <img src={props.stories[curStory].url}  /> : <></> }
-                    { props.stories[curStory].type === 'video' ? <video src={props.stories[curStory].url } /> : <></> }
+                    { props.stories[curStory].type !== 'video' && <>
+                        <div id='progress-bar'></div>
+                        <ProgressBar />
+                    </> }
                 </>
             }
             
-            <div id='progress-bar'></div>
         </div>
     )
 }
